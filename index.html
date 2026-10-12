@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Alien Dispensary — Day 1</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sometype+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #e9f2ec;
+        --bg-deep: #d7e8dc;
+        --panel: #ffffff;
+        --panel-2: #f2f7f3;
+        --ink: #16241b;
+        --ink-soft: #48584d;
+        --line: #b9cfc0;
+        --accent: #177a4c;
+        --accent-ink: #0d5a37;
+        --accent-soft: #d9efe2;
+        --gold: #b8860b;
+        --gold-soft: #fbf0cd;
+        --red: #bf2f27;
+        --red-soft: #fbe3e1;
+        --stamp: #bf2f27;
+        --doc: #fdfdf4;
+        --doc-line: #d8d8c2;
+        --shadow: 0 10px 30px rgba(18, 48, 30, .14);
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: dark;
+          --bg: #08120d;
+          --bg-deep: #0a1a11;
+          --panel: #101f16;
+          --panel-2: #0c1811;
+          --ink: #e4f2e7;
+          --ink-soft: #9db8a6;
+          --line: #274434;
+          --accent: #4ecb85;
+          --accent-ink: #7fe0a8;
+          --accent-soft: #143526;
+          --gold: #e8bc4a;
+          --gold-soft: #2e2508;
+          --red: #ff7a70;
+          --red-soft: #38120e;
+          --stamp: #ff6b61;
+          --doc: #17251b;
+          --doc-line: #2c4636;
+          --shadow: 0 10px 30px rgba(0, 0, 0, .5);
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.45;
+        -webkit-font-smoothing: antialiased;
+      }
+      h1, h2, h3, .disp { font-family: "Chakra Petch", "Segoe UI", system-ui, sans-serif; }
+      .mono { font-family: "Sometype Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+      button { font: inherit; cursor: pointer; }
+      button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 14px 14px 40px; }
+
+      /* ---------- top status bar ---------- */
+      .statusbar {
+        display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+        background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 10px 16px; box-shadow: var(--shadow); position: sticky; top: 10px; z-index: 30;
+      }
+      .statusbar .brand { font-family: "Chakra Petch", sans-serif; font-weight: 700; letter-spacing: .04em; font-size: 1.02rem; }
+      .statusbar .brand span { color: var(--accent); }
+      .stat { display: flex; align-items: baseline; gap: 6px; font-size: .92rem; }
+      .stat b { font-family: "Sometype Mono", monospace; font-size: 1.05rem; }
+      .stat .lbl { color: var(--ink-soft); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+      .stat.cite b { color: var(--red); }
+      .spacer { flex: 1; }
+      .icon-btn {
+        background: var(--panel-2); border: 1px solid var(--line); color: var(--ink);
+        border-radius: 9px; padding: 6px 12px; font-weight: 600; font-size: .88rem;
+      }
+      .icon-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+      .queue-dots { display: flex; gap: 5px; align-items: center; }
+      .qdot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--line); background: transparent; }
+      .qdot.done { background: var(--accent); border-color: var(--accent); }
+      .qdot.now { border-color: var(--accent); background: var(--gold-soft); box-shadow: 0 0 0 3px var(--accent-soft); }
+      .qdot.bad { background: var(--red); border-color: var(--red); }
+
+      .mgr-line {
+        margin: 10px 2px 0; font-size: .9rem; color: var(--ink-soft);
+        display: flex; gap: 8px; align-items: baseline;
+      }
+      .mgr-line b { color: var(--accent-ink); font-family: "Chakra Petch", sans-serif; font-size: .82rem; letter-spacing: .05em; white-space: nowrap; }
+
+      /* ---------- layout ---------- */
+      .game-grid {
+        display: grid; gap: 14px; margin-top: 12px;
+        grid-template-columns: 1fr;
+      }
+      @media (min-width: 920px) {
+        .game-grid { grid-template-columns: 5fr 7fr; align-items: start; }
+        .col-right { position: sticky; top: 86px; }
+      }
+      .card {
+        background: var(--panel); border: 1px solid var(--line);
+        border-radius: var(--radius); box-shadow: var(--shadow);
+      }
+      .card-h {
+        padding: 10px 16px; border-bottom: 1px solid var(--line);
+        font-family: "Chakra Petch", sans-serif; font-weight: 600; letter-spacing: .05em;
+        font-size: .82rem; text-transform: uppercase; color: var(--ink-soft);
+        display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      }
+
+      /* ---------- customer stage ---------- */
+      .stage { padding: 18px 16px 14px; text-align: center; position: relative; overflow: hidden; }
+      .stage .window {
+        background: var(--bg-deep); border: 1px solid var(--line); border-radius: 12px;
+        padding: 16px 8px 6px; position: relative;
+      }
+      .portrait { width: 168px; height: 168px; margin: 0 auto; display: block; }
+      .cust-name { font-family: "Chakra Petch", sans-serif; font-weight: 700; font-size: 1.25rem; margin-top: 8px; }
+      .cust-sub { color: var(--ink-soft); font-size: .9rem; }
+      .speech {
+        margin: 14px 4px 2px; background: var(--panel); border: 1px solid var(--line);
+        border-radius: 12px; padding: 12px 14px; text-align: left; position: relative; font-size: 1.02rem;
+      }
+      .speech::before {
+        content: ""; position: absolute; top: -8px; left: 50%; margin-left: -8px;
+        width: 14px; height: 14px; background: var(--panel);
+        border-left: 1px solid var(--line); border-top: 1px solid var(--line);
+        transform: rotate(45deg);
+      }
+      .speech .wants { display: block; margin-top: 8px; font-size: .88rem; color: var(--accent-ink); font-weight: 600; }
+      .big-stamp {
+        position: absolute; top: 44%; left: 50%; z-index: 5;
+        transform: translate(-50%, -50%) rotate(-14deg) scale(2.4);
+        font-family: "Chakra Petch", sans-serif; font-weight: 700; letter-spacing: .12em;
+        padding: 6px 18px; border: 4px solid var(--stamp); border-radius: 8px; color: var(--stamp);
+        background: color-mix(in srgb, var(--panel) 78%, transparent);
+        opacity: 0; pointer-events: none; font-size: 1.5rem; white-space: nowrap;
+      }
+      .big-stamp.show { animation: slam .45s cubic-bezier(.2, 2.2, .4, 1) forwards; }
+      .big-stamp.ok { --stamp: var(--accent); }
+      @keyframes slam {
+        0% { opacity: 0; transform: translate(-50%, -50%) rotate(-14deg) scale(2.6); }
+        60% { opacity: 1; transform: translate(-50%, -50%) rotate(-14deg) scale(.94); }
+        100% { opacity: 1; transform: translate(-50%, -50%) rotate(-14deg) scale(1); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .big-stamp.show { animation: none; opacity: 1; transform: translate(-50%, -50%) rotate(-14deg) scale(1); }
+      }
+
+      /* ---------- documents ---------- */
+      .docs { padding: 12px; display: grid; gap: 10px; }
+      .doc {
+        background: var(--doc); border: 1px solid var(--doc-line); border-radius: 10px;
+        padding: 10px 12px; font-size: .88rem;
+      }
+      .doc h4 {
+        margin: 0 0 6px; font-family: "Sometype Mono", monospace; font-size: .72rem;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft);
+        display: flex; justify-content: space-between; gap: 8px;
+      }
+      .doc h4 .tag { letter-spacing: .02em; text-transform: none; font-weight: 600; }
+      .tag.rec { color: var(--accent-ink); }
+      .tag.med { color: var(--gold); }
+      .tag.exp { color: var(--red); font-weight: 700; }
+      .doc dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; }
+      .doc dt { color: var(--ink-soft); }
+      .doc dd { margin: 0; font-weight: 600; }
+      .doc ul { margin: 4px 0 0; padding-left: 18px; }
+      .doc li { margin: 2px 0; }
+      .doc .flag { color: var(--red); font-weight: 700; }
+      .doc .fine { color: var(--accent-ink); font-weight: 600; }
+
+      /* ---------- shelf ---------- */
+      .shelf { padding: 12px; display: grid; gap: 9px; grid-template-columns: 1fr; }
+      @media (min-width: 560px) { .shelf { grid-template-columns: 1fr 1fr; } }
+      .prod {
+        text-align: left; background: var(--panel-2); border: 1.5px solid var(--line);
+        border-radius: 11px; padding: 10px 12px; color: var(--ink); width: 100%;
+      }
+      .prod:hover { border-color: var(--accent); }
+      .prod.sel { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 2px var(--accent-soft); }
+      .prod .pname { font-family: "Chakra Petch", sans-serif; font-weight: 700; font-size: .98rem; display: flex; justify-content: space-between; gap: 8px; }
+      .prod .pname .price { font-family: "Sometype Mono", monospace; color: var(--accent-ink); }
+      .prod .pmeta { font-size: .82rem; color: var(--ink-soft); margin-top: 2px; }
+      .prod .ptag {
+        display: inline-block; margin-top: 6px; font-size: .7rem; font-weight: 700; letter-spacing: .06em;
+        text-transform: uppercase; padding: 2px 7px; border-radius: 20px; border: 1px solid var(--line);
+      }
+      .ptag.medonly { color: var(--gold); border-color: var(--gold); }
+      .ptag.hot { color: var(--red); border-color: var(--red); }
+
+      /* ---------- actions ---------- */
+      .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+      .stamp-btn {
+        border-radius: 12px; padding: 16px 10px; font-family: "Chakra Petch", sans-serif;
+        font-weight: 700; letter-spacing: .1em; font-size: 1.05rem; border: 3px solid;
+        background: var(--panel); transition: transform .06s ease;
+      }
+      .stamp-btn:active { transform: scale(.97) rotate(-1deg); }
+      .stamp-btn.approve { color: var(--accent-ink); border-color: var(--accent); }
+      .stamp-btn.approve:disabled { opacity: .38; cursor: not-allowed; }
+      .stamp-btn.approve:not(:disabled):hover { background: var(--accent-soft); }
+      .stamp-btn.deny { color: var(--stamp); border-color: var(--stamp); }
+      .stamp-btn.deny:hover { background: var(--red-soft); }
+      .stamp-btn small { display: block; letter-spacing: .02em; font-weight: 500; font-size: .72rem; margin-top: 3px; font-family: "Segoe UI", system-ui, sans-serif; text-transform: none; }
+      .hintline { text-align: center; color: var(--ink-soft); font-size: .85rem; margin-top: 8px; min-height: 1.2em; }
+
+      /* ---------- modal / overlays ---------- */
+      .overlay {
+        position: fixed; inset: 0; background: rgba(4, 12, 7, .62);
+        display: none; align-items: center; justify-content: center; z-index: 60; padding: 14px;
+      }
+      .overlay.open { display: flex; }
+      .sheet {
+        background: var(--panel); color: var(--ink); border: 1px solid var(--line);
+        border-radius: 16px; max-width: 620px; width: 100%; max-height: 88vh; overflow-y: auto;
+        box-shadow: var(--shadow); padding: 22px 22px 18px;
+      }
+      .sheet h2 { margin: 0 0 6px; font-size: 1.45rem; }
+      .sheet h3 { margin: 18px 0 6px; font-size: 1.02rem; }
+      .verdict {
+        font-family: "Chakra Petch", sans-serif; font-weight: 700; letter-spacing: .1em;
+        display: inline-block; padding: 5px 14px; border: 3px solid; border-radius: 8px;
+        transform: rotate(-2deg); font-size: 1.05rem; margin-bottom: 10px;
+      }
+      .verdict.good { color: var(--accent-ink); border-color: var(--accent); }
+      .verdict.mid { color: var(--gold); border-color: var(--gold); }
+      .verdict.bad { color: var(--stamp); border-color: var(--stamp); }
+      .delta { font-family: "Sometype Mono", monospace; font-weight: 600; }
+      .delta.plus { color: var(--accent-ink); } .delta.minus { color: var(--red); }
+      .review {
+        background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
+        padding: 10px 14px; margin-top: 12px; font-size: .95rem;
+      }
+      .review .stars { color: var(--gold); letter-spacing: .15em; font-size: 1rem; }
+      .review .who { color: var(--ink-soft); font-size: .82rem; margin-top: 2px; }
+      .btn {
+        background: var(--accent); color: #fff; border: none; border-radius: 10px;
+        padding: 12px 22px; font-weight: 700; font-family: "Chakra Petch", sans-serif; letter-spacing: .04em;
+      }
+      @media (prefers-color-scheme: dark) { .btn { color: #06130b; } }
+      .btn:hover { filter: brightness(1.08); }
+      .btn.ghost { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); }
+      .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+      .rules-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+      .rules-table th, .rules-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      .rules-table th { font-family: "Chakra Petch", sans-serif; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+      ul.tight { margin: 6px 0; padding-left: 20px; } ul.tight li { margin: 4px 0; }
+
+      /* ---------- briefing & end ---------- */
+      .hero { padding: 30px 22px 8px; text-align: center; }
+      .hero .over { font-family: "Sometype Mono", monospace; letter-spacing: .22em; font-size: .78rem; color: var(--accent-ink); text-transform: uppercase; }
+      .hero h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); margin: 6px 0 4px; letter-spacing: .02em; }
+      .hero h1 span { color: var(--accent); }
+      .hero p.lede { max-width: 620px; margin: 8px auto 0; color: var(--ink-soft); font-size: 1.05rem; }
+      .brief-grid { display: grid; gap: 14px; padding: 18px; grid-template-columns: 1fr; }
+      @media (min-width: 820px) { .brief-grid { grid-template-columns: 1fr 1fr; } }
+      .brief-box { background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+      .brief-box h3 { margin: 0 0 6px; font-size: .95rem; letter-spacing: .04em; }
+      .endstats { display: flex; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
+      .endstat { flex: 1 1 120px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; text-align: center; }
+      .endstat b { display: block; font-family: "Sometype Mono", monospace; font-size: 1.5rem; }
+      .endstat span { font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-soft); }
+      .recap { font-size: .92rem; }
+      .recap li { margin: 5px 0; }
+      .rank { font-family: "Chakra Petch", sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent-ink); }
+      .hidden { display: none !important; }
+      footer.note { text-align: center; color: var(--ink-soft); font-size: .8rem; margin-top: 22px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- ======================= BRIEFING ======================= -->
+      <section id="screen-brief" class="card">
+        <div class="hero">
+          <div class="over">The Greenery Room · Orbital Station 7 · Now Hiring (Desperate)</div>
+          <h1>ALIEN <span>DISPENSARY</span></h1>
+          <p class="lede">You are the only human budtender on the station — hired because humans are the one species that doesn't explode, molt, achieve telepathy, or enter a 40-year hibernation from a 10&nbsp;mg gummy. Ten customers. One counter. A stamp with your name on it.</p>
+        </div>
+        <div class="brief-grid">
+          <div class="brief-box">
+            <h3>HOW A SHIFT WORKS</h3>
+            <ul class="tight">
+              <li><b>Read the request.</b> Customers describe their problems terribly. That's the job.</li>
+              <li><b>Check the documents.</b> Galactic ID, permit, and the Species Tolerance Registry. Something is usually off.</li>
+              <li><b>Pick a product</b> from the shelf that matches their need, their species, and the law — or don't sell at all.</li>
+              <li><b>Stamp it.</b> APPROVED sells your selected product. DENIED sends them away. Both can be right. Both can end your career.</li>
+            </ul>
+          </div>
+          <div class="brief-box">
+            <h3>DAY 1 RULES — THE SHORT VERSION</h3>
+            <ul class="tight">
+              <li>Adult age is <b>different for every species</b>. A 5-year-old Klarg is a grown taxpayer. An 87-year-old Nebula Ent is a child.</li>
+              <li><b>Medical-only products</b> need a valid, unexpired medical permit.</li>
+              <li>The Registry flags hard limits — THC caps, edible dose caps, allergens. <b>Registry beats customer confidence.</b></li>
+              <li><b>3 citations from the ICD</b> (Intergalactic Compliance Division) and you're fired. The stamp giveth, the stamp taketh away.</li>
+            </ul>
+          </div>
+          <div class="brief-box">
+            <h3>SCORING</h3>
+            <ul class="tight">
+              <li>Perfect match: sale + tip. Wrong-but-legal product: sale, no tip, side-eye.</li>
+              <li>Correct denial: +15₡ compliance bonus. Wrongful denial: a 1-star review with your name in it.</li>
+              <li>Illegal sale: citation. Yes, even if they were really nice about it.</li>
+            </ul>
+          </div>
+          <div class="brief-box">
+            <h3>FROM YOUR MANAGER, DEB</h3>
+            <ul class="tight">
+              <li>"Welcome aboard. The handbook button is right under Clock In — and there's another one on the counter all shift. Read it, it's the whole job."</li>
+              <li>"Do NOT upsell the loyalty program to anyone who is actively molting."</li>
+              <li>"If someone says 'my cousin's a budtender on Colorado Prime,' that is not a medical permit."</li>
+            </ul>
+          </div>
+        </div>
+        <div style="text-align:center; padding: 0 18px 26px;">
+          <button class="btn" id="btn-start" style="font-size:1.1rem; padding: 14px 34px;">CLOCK IN — START DAY 1</button>
+          <div style="margin-top:10px;"><button class="icon-btn" id="btn-book-brief">Open the Species Handbook</button></div>
+        </div>
+      </section>
+
+      <!-- ======================= GAME ======================= -->
+      <section id="screen-game" class="hidden">
+        <div class="statusbar">
+          <div class="brand">ALIEN <span>DISPENSARY</span></div>
+          <div class="stat"><span class="lbl">Shift</span><b>Day 1</b></div>
+          <div class="stat"><span class="lbl">Customer</span><b id="st-count">1 / 10</b></div>
+          <div class="queue-dots" id="st-dots" aria-hidden="true"></div>
+          <div class="spacer"></div>
+          <div class="stat"><span class="lbl">Credits</span><b id="st-credits">0₡</b></div>
+          <div class="stat cite"><span class="lbl">Citations</span><b id="st-cites">0 / 3</b></div>
+          <button class="icon-btn" id="btn-book">Handbook</button>
+          <button class="icon-btn" id="btn-sound" aria-label="Toggle sound">Sound: On</button>
+        </div>
+        <p class="mgr-line"><b>DEB (MGR)</b><span id="mgr-text"></span></p>
+
+        <div class="game-grid">
+          <div class="col-left">
+            <div class="card stage">
+              <div class="window">
+                <div id="portrait-slot"></div>
+                <div class="big-stamp" id="big-stamp">APPROVED</div>
+              </div>
+              <div class="cust-name" id="cust-name"></div>
+              <div class="cust-sub" id="cust-sub"></div>
+              <div class="speech" id="cust-speech"></div>
+            </div>
+            <div class="card" style="margin-top:14px;">
+              <div class="card-h"><span>Documents on the counter</span><span class="mono" style="text-transform:none; letter-spacing:0;">check everything</span></div>
+              <div class="docs" id="docs-slot"></div>
+            </div>
+          </div>
+
+          <div class="col-right">
+            <div class="card">
+              <div class="card-h"><span>The Shelf</span><span id="shelf-note">select one product to sell</span></div>
+              <div class="shelf" id="shelf-slot"></div>
+            </div>
+            <div class="actions">
+              <button class="stamp-btn approve" id="btn-approve" disabled>APPROVED<small id="approve-sub">select a product first</small></button>
+              <button class="stamp-btn deny" id="btn-deny">DENIED<small>no sale — send them away</small></button>
+            </div>
+            <p class="hintline" id="hintline">The stamp is loaded. The stamp is always loaded.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================= END OF DAY ======================= -->
+      <section id="screen-end" class="card hidden" style="padding: 26px 24px;">
+        <div class="over mono" style="letter-spacing:.2em; font-size:.75rem; color: var(--accent-ink); text-transform: uppercase;">End of Shift Report · Filed with Galacticorp HR</div>
+        <h2 id="end-title" style="font-size:1.9rem; margin:6px 0 2px;">Day 1 Complete</h2>
+        <div class="rank" id="end-rank"></div>
+        <p id="end-blurb" style="color: var(--ink-soft); max-width: 640px;"></p>
+        <div class="endstats">
+          <div class="endstat"><b id="end-credits">0₡</b><span>Credits earned</span></div>
+          <div class="endstat"><b id="end-served">0</b><span>Customers served</span></div>
+          <div class="endstat"><b id="end-perfect">0</b><span>Perfect matches</span></div>
+          <div class="endstat"><b id="end-cites">0</b><span>Citations</span></div>
+          <div class="endstat"><b id="end-stars">—</b><span>Avg. review</span></div>
+        </div>
+        <h3>Shift log</h3>
+        <ul class="recap" id="end-recap"></ul>
+        <h3>Posted reviews</h3>
+        <div id="end-reviews"></div>
+        <div class="btn-row">
+          <button class="btn" id="btn-again">WORK ANOTHER DAY 1</button>
+          <button class="btn ghost" id="btn-book-end">Re-read the Handbook</button>
+        </div>
+      </section>
+
+      <footer class="note">A Day 1 prototype. No aliens were over-served in the making of this shift.</footer>
+    </div>
+
+    <!-- ======================= HANDBOOK MODAL ======================= -->
+    <div class="overlay" id="overlay-book" role="dialog" aria-modal="true" aria-label="Species handbook">
+      <div class="sheet">
+        <h2>Species Handbook — Day 1 Edition</h2>
+        <p style="color:var(--ink-soft); margin-top:0;">Galactic Federation standard reference. Updated this morning, obviously, just to keep you on your toes. The Registry card on the counter always overrides this page for an individual customer.</p>
+        <table class="rules-table">
+          <thead><tr><th>Species</th><th>Adult at</th><th>Know this</th></tr></thead>
+          <tbody>
+            <tr><td><b>Human</b></td><td>21 yrs</td><td>Standard everything. Terrified of being seen buying weed by anyone from their home planet.</td></tr>
+            <tr><td><b>Boulderian</b></td><td>20 cycles</td><td>Two tons of living rock. Enormous tolerance. Doses that would crater a village are a light snack.</td></tr>
+            <tr><td><b>Nebula Ent</b></td><td>412 yrs</td><td>Treefolk. Look ancient at every age. An 87-year-old Ent is a minor no matter how wise the beard of moss looks.</td></tr>
+            <tr><td><b>Klarg</b></td><td>3 yrs</td><td>900-gram sentient gel. Adults look exactly like babies of every other species. Max edible dose 10&nbsp;mg, max flower 25% THC — small body, full consequences.</td></tr>
+            <tr><td><b>Tentaculan</b></td><td>18 yrs</td><td><b>Limonene is a severe allergen.</b> Citrus terps = citation + a very dramatic rash in 9 appendages.</td></tr>
+            <tr><td><b>Moon Sprite</b></td><td>30 sprite-yrs</td><td>Weighs about 5&nbsp;kg with the wings. Max edible dose 10&nbsp;mg. A 100&nbsp;mg bar is not a dose, it's an orbital event.</td></tr>
+            <tr><td><b>Verdantian</b></td><td>50 yrs</td><td>Sentient plants. Buying flower is normal, polite commerce (for Petalborn subspecies it's romantic). No stomach — edibles are a medical emergency, not a snack.</td></tr>
+            <tr><td><b>Unit-series Robot</b></td><td>n/a</td><td>Not biological. CBD oil is a maintenance product — no permit needed. Selling them THC voids their warranty and counts as waste fraud.</td></tr>
+            <tr><td><b>Vexian</b></td><td>25 yrs</td><td>Shapeshifters. Their ID photo <b>never</b> matches their current face. That is legal and normal. Judge the permit and ID number, never the face.</td></tr>
+          </tbody>
+        </table>
+        <h3>Standing rules</h3>
+        <ul class="tight">
+          <li><b>Medical-only</b> products (tagged on the shelf) require a medical permit that is <b>valid today</b>. "It expired yesterday" is expired.</li>
+          <li>Registry flags — THC caps, dose caps, allergens — are hard law, not suggestions. The customer's confidence is not evidence.</li>
+          <li>Recreational permit covers everything not tagged medical-only. No permit at all = no sale, full stop.</li>
+          <li>Three ICD citations in a shift and you're fired on the spot. Deb will not cry. Deb never cries.</li>
+        </ul>
+        <div class="btn-row"><button class="btn" id="btn-book-close">BACK TO THE COUNTER</button></div>
+      </div>
+    </div>
+
+    <!-- ======================= RESOLUTION MODAL ======================= -->
+    <div class="overlay" id="overlay-result" role="dialog" aria-modal="true" aria-label="Result">
+      <div class="sheet">
+        <div class="verdict" id="res-verdict">PERFECT MATCH</div>
+        <h2 id="res-title" style="margin-top:2px;"></h2>
+        <p id="res-body"></p>
+        <p class="delta" id="res-delta"></p>
+        <div class="review" id="res-review">
+          <div class="stars" id="res-stars"></div>
+          <div id="res-quote"></div>
+          <div class="who" id="res-who"></div>
+        </div>
+        <div class="btn-row"><button class="btn" id="btn-next">NEXT CUSTOMER</button></div>
+      </div>
+    </div>
+
+    <script>
+    "use strict";
+    /* ==================== DATA ==================== */
+    var PRODUCTS = {
+      blackhole: { name: "Black Hole Kush", meta: "Indica pre-roll · 22% THC · myrcene-heavy · for sleep", price: 24, tag: "" },
+      moonrocks: { name: "Moon Rocks", meta: "Actual moon rocks rolled in oil & kief · 51% THC · slight gravitational pull", price: 60, tag: "hot", tagText: "Extreme potency" },
+      sativa:    { name: "Sun-Kissed Sativa", meta: "Flower · 24% THC · limonene-forward · bright & creative", price: 28, tag: "" },
+      dusty:     { name: "Dust Comet Pre-Roll", meta: "31% THC · limonene · been in the case since the old manager. You know the one.", price: 18, tag: "" },
+      pulsar:    { name: "Pulsar Haze", meta: "Sativa flower · 19% THC · pinene + myrcene, zero limonene · focused & creative", price: 26, tag: "" },
+      gummies:   { name: "Zero-G Gummies", meta: "Edible · 5 mg each · expand to full size AFTER ingestion, read the label", price: 15, tag: "" },
+      bar:       { name: "Singularity Bar", meta: "Edible · 100 mg single bar · for high-tolerance species and poor decisions", price: 30, tag: "hot", tagText: "100 mg" },
+      mints:     { name: "Microdose Mints", meta: "Edible · 2.5 mg each · for tiny bodies and first-timers", price: 10, tag: "" },
+      cbdoil:    { name: "CBD-9000 Joint Oil", meta: "0% THC · CBD lubricant · squeaks, aches, hinges", price: 20, tag: "" },
+      tincture:  { name: "Nebula Nights Tincture", meta: "High-CBD drops · deep sleep · MEDICAL ONLY", price: 35, tag: "medonly", tagText: "Medical only" }
+    };
+    var SHELF = ["blackhole","moonrocks","sativa","dusty","pulsar","gummies","bar","mints","cbdoil","tincture"];
+
+    var PORTRAITS = {
+      boulderian: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Boulderian, a living rock person"><path d="M100 18 L158 52 L172 116 L138 178 L62 178 L28 116 L42 52 Z" fill="#8d99a6" stroke="#5b6771" stroke-width="4"/><path d="M42 52 L84 92 L62 178 M158 52 L118 104 L138 178 M84 92 L118 104" stroke="#5b6771" stroke-width="3" fill="none" opacity=".6"/><circle cx="78" cy="96" r="8" fill="#20303c"/><circle cx="124" cy="96" r="8" fill="#20303c"/><path d="M82 140 Q100 132 118 140" stroke="#20303c" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="150" cy="40" r="7" fill="#7fae7a"/></svg>',
+      human: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Human customer"><circle cx="100" cy="86" r="46" fill="#e8b58e" stroke="#b57f52" stroke-width="3"/><path d="M52 74 Q54 30 100 28 Q146 30 148 74 L134 70 Q100 46 66 70 Z" fill="#274b73"/><rect x="52" y="66" width="96" height="10" rx="5" fill="#1b3552"/><path d="M58 188 L66 138 Q100 124 134 138 L142 188 Z" fill="#3f6212"/><circle cx="84" cy="86" r="5" fill="#20303c"/><circle cx="116" cy="86" r="5" fill="#20303c"/><path d="M86 112 Q100 120 114 110" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><text x="100" y="168" text-anchor="middle" font-family="monospace" font-size="12" fill="#d9f99d">31% OR BUST</text></svg>',
+      ent: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Nebula Ent, a tree person"><path d="M84 190 L88 120 L70 88 M88 120 L96 190 M112 190 L108 116 L132 82 M108 116 L96 190" stroke="#6d4c2f" stroke-width="12" fill="none" stroke-linecap="round"/><ellipse cx="100" cy="96" rx="34" ry="42" fill="#7a5a36" stroke="#543d22" stroke-width="3"/><ellipse cx="100" cy="96" rx="20" ry="27" fill="none" stroke="#543d22" stroke-width="2" opacity=".6"/><circle cx="88" cy="90" r="4.5" fill="#20303c"/><circle cx="112" cy="90" r="4.5" fill="#20303c"/><path d="M88 116 Q100 122 112 114" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M66 66 Q40 30 74 22 Q84 44 66 66 M134 62 Q162 28 128 18 Q116 42 134 62 M100 52 Q100 14 128 10 Q130 38 100 52" fill="#5d8a4a"/></svg>',
+      klarg: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Klarg, a small sentient gel"><path d="M100 34 Q158 34 158 104 Q158 168 100 168 Q42 168 42 104 Q42 34 100 34 Z" fill="#f2a7c3" opacity=".88" stroke="#cf6f97" stroke-width="3"/><circle cx="80" cy="98" r="13" fill="#fff"/><circle cx="122" cy="98" r="13" fill="#fff"/><circle cx="80" cy="100" r="6" fill="#20303c"/><circle cx="122" cy="100" r="6" fill="#20303c"/><ellipse cx="100" cy="130" rx="9" ry="6" fill="#a63d68"/><path d="M64 52 Q100 30 136 52" stroke="#ffd7e7" stroke-width="7" fill="none" stroke-linecap="round" opacity=".8"/><circle cx="140" cy="140" r="6" fill="#ffd7e7" opacity=".8"/><circle cx="58" cy="128" r="4" fill="#ffd7e7" opacity=".8"/></svg>',
+      tentaculan: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Tentaculan with many tentacles"><ellipse cx="100" cy="76" rx="46" ry="40" fill="#8b7fd4" stroke="#5f54a8" stroke-width="3"/><circle cx="84" cy="72" r="6" fill="#141c2e"/><circle cx="104" cy="66" r="6" fill="#141c2e"/><circle cx="118" cy="80" r="6" fill="#141c2e"/><path d="M86 96 Q100 104 112 94" stroke="#141c2e" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M62 108 Q44 138 58 162 M80 114 Q72 146 84 168 M100 116 Q100 148 110 168 M120 114 Q132 144 124 166 M138 106 Q156 132 146 158" stroke="#8b7fd4" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M62 108 Q44 138 58 162 M138 106 Q156 132 146 158" stroke="#5f54a8" stroke-width="2" fill="none" opacity=".5"/></svg>',
+      sprite: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Moon Sprite, tiny and winged"><path d="M62 92 Q14 60 26 108 Q34 136 66 122 Z" fill="#bfe3ff" opacity=".8" stroke="#7fb2e0" stroke-width="2"/><path d="M138 92 Q186 60 174 108 Q166 136 134 122 Z" fill="#bfe3ff" opacity=".8" stroke="#7fb2e0" stroke-width="2"/><circle cx="100" cy="86" r="34" fill="#ffe9a8" stroke="#d9a83f" stroke-width="3"/><circle cx="88" cy="84" r="4.5" fill="#20303c"/><circle cx="112" cy="84" r="4.5" fill="#20303c"/><path d="M90 104 Q100 110 110 103" stroke="#20303c" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M100 120 L100 152 M84 138 L116 138" stroke="#d9a83f" stroke-width="6" stroke-linecap="round"/><path d="M84 52 L90 66 M116 52 L110 66 M100 44 L100 60" stroke="#d9a83f" stroke-width="4" stroke-linecap="round"/></svg>',
+      oldhuman: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Elderly human customer"><circle cx="100" cy="88" r="46" fill="#eec39e" stroke="#bd8f5f" stroke-width="3"/><path d="M54 80 Q52 40 100 40 Q148 40 146 80 Q146 56 100 54 Q54 56 54 80" fill="#e8e8e8"/><circle cx="82" cy="90" r="13" fill="none" stroke="#44546a" stroke-width="3"/><circle cx="118" cy="90" r="13" fill="none" stroke="#44546a" stroke-width="3"/><path d="M95 90 L105 90" stroke="#44546a" stroke-width="3"/><path d="M84 124 Q100 132 116 122" stroke="#7a5a3a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M66 132 Q100 152 134 132 L138 170 Q100 184 62 170 Z" fill="#e8e8e8" opacity=".85"/></svg>',
+      robot: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Unit-series robot"><rect x="56" y="56" width="88" height="76" rx="14" fill="#aeb9c2" stroke="#67727c" stroke-width="3"/><rect x="68" y="78" width="64" height="20" rx="9" fill="#20303c"/><circle cx="86" cy="88" r="6" fill="#7fe0a8"/><circle cx="114" cy="88" r="6" fill="#ffb84a"/><path d="M78 116 L122 116" stroke="#67727c" stroke-width="4" stroke-linecap="round"/><path d="M100 56 L100 34" stroke="#67727c" stroke-width="4"/><circle cx="100" cy="28" r="7" fill="#ff6b61"/><rect x="44" y="84" width="12" height="26" rx="5" fill="#8d99a6"/><rect x="144" y="84" width="12" height="26" rx="5" fill="#8d99a6"/><path d="M70 132 L66 168 M130 132 L134 168" stroke="#67727c" stroke-width="8" stroke-linecap="round"/><circle cx="164" cy="150" r="4" fill="#ffb84a"/><circle cx="36" cy="140" r="3" fill="#ffb84a"/></svg>',
+      verdantian: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Verdantian, a sentient plant"><path d="M100 108 L100 182" stroke="#4d7c43" stroke-width="10" stroke-linecap="round"/><path d="M100 150 Q66 140 58 112 Q92 116 100 150 M100 160 Q136 152 142 122 Q108 128 100 160" fill="#5d8a4a"/><g fill="#e77fa2" stroke="#c4527c" stroke-width="2"><ellipse cx="100" cy="46" rx="11" ry="24"/><ellipse cx="66" cy="64" rx="11" ry="24" transform="rotate(-52 66 64)"/><ellipse cx="134" cy="64" rx="11" ry="24" transform="rotate(52 134 64)"/><ellipse cx="74" cy="96" rx="10" ry="20" transform="rotate(-96 74 96)"/><ellipse cx="126" cy="96" rx="10" ry="20" transform="rotate(96 126 96)"/></g><circle cx="100" cy="76" r="21" fill="#f6c445" stroke="#d9a83f" stroke-width="2"/><circle cx="93" cy="74" r="3.4" fill="#20303c"/><circle cx="107" cy="74" r="3.4" fill="#20303c"/><path d="M93 86 Q100 91 107 85" stroke="#20303c" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
+      vexian: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Vexian shapeshifter, mid-shift"><path d="M100 42 a46 50 0 0 1 0 100 Z" fill="#c9a1e0"/><path d="M100 42 a46 50 0 0 0 0 100 Z" fill="#7fc7a5"/><ellipse cx="100" cy="92" rx="46" ry="50" fill="none" stroke="#54655c" stroke-width="3"/><circle cx="82" cy="88" r="5" fill="#20303c"/><circle cx="120" cy="84" r="7" fill="#20303c"/><circle cx="120" cy="84" r="3" fill="#ffd7e7"/><path d="M84 118 Q102 126 118 112" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M100 42 L100 142" stroke="#54655c" stroke-width="2" stroke-dasharray="4 5"/><circle cx="66" cy="66" r="4" fill="#c9a1e0"/><circle cx="140" cy="120" r="5" fill="#7fc7a5"/></svg>'
+    };
+
+    var CUSTOMERS = [
+      {
+        name: "Grob", species: "Boulderian", portrait: "boulderian",
+        sub: "Asteroid demolition · 2.1 metric tons of patience",
+        speech: "\"Long shift breaking rocks in the belt. I need to be OUT. Like, tectonically out. Something for sleep — the strong end of sleep, friend.\"",
+        wants: "Wants: a sleep product. Everything about him checks out.",
+        docs: {
+          id: [["Name", "GROB SON-OF-GRANITE"], ["Species", "Boulderian"], ["Age", "340 cycles"], ["ID photo", "A rock. It is him. He has not changed since the Cretaceous."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "EXTREME — standard doses are a garnish"], ["Flags", "<span class='fine'>None. Model customer.</span>"]]
+        },
+        best: "blackhole", ok: [], tip: 8,
+        bad: { tincture: "The Nebula Nights Tincture is medical-only and Grob holds a recreational permit. Citation — and Grob does the paperwork walk of shame." },
+        reviewGood: "\"Slept through a minor asteroid impact. 10/10.\"", reviewOk: "\"It was fine, I guess. I am a rock. Everything is fine.\"", reviewDeny: "\"Denied a ROCK for being too ROCK. Reporting this to the geology council.\""
+      },
+      {
+        name: "Kyle", species: "Human", portrait: "human",
+        sub: "From Neo-Texas · says \"bro\" in three languages",
+        speech: "\"Bro. BRO. I don't care what it is, I don't care what it does — give me the HIGHEST THC you have. Highest number wins. That's the whole personality, bro.\"",
+        wants: "Wants: the highest THC on the shelf. His Registry card says something else.",
+        docs: {
+          id: [["Name", "KYLE BRADDOCK"], ["Species", "Human"], ["Age", "34 yrs"], ["ID photo", "Matches. Same backwards cap, somehow laminated into the ID."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "LOW — self-reported 'legend' status is unverified and, per his physician, 'aspirational'"], ["Flags", "<span class='flag'>PHYSICIAN CAP: max 25% THC.</span> Exceeding it is a citation, not a vibe."]]
+        },
+        best: "sativa", ok: ["blackhole", "pulsar"], tip: 10,
+        bad: {
+          moonrocks: "51% THC to a customer with a physician-flagged 25% cap. Kyle achieved orbit, saw his ancestors, and the ICD saw the receipt. Citation.",
+          dusty: "The Dust Comet is 31% — over Kyle's 25% registry cap. He spent four hours apologizing to a vending machine. Citation.",
+          bar: "100 mg to a low-tolerance human whose file literally says 'aspirational.' Citation."
+        },
+        reviewGood: "\"24% but the terps, bro. THE TERPS. I get it now.\"", reviewOk: "\"Not the highest number but whatever, it worked. 4 stars.\"", reviewDeny: "\"Denied?! I have a NOTE from my COUSIN who's a budtender. 1 star.\""
+      },
+      {
+        name: "Timble", species: "Nebula Ent", portrait: "ent",
+        sub: "Towering · moss beard · speaks very, very slowly",
+        speech: "\"Hooooom. I am eighty-seven years old, little budtender. I have seen empires photosynthesize and fall. Surely... a small flower... for my grove-day...\"",
+        wants: "Wants: flower for his 87th birthday. He looks ancient. Check the Handbook.",
+        docs: {
+          id: [["Name", "TIMBLE OAKHEART"], ["Species", "Nebula Ent"], ["Age", "87 yrs"], ["ID photo", "A sapling. It is also somehow still him."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "Unknown — never been served"], ["Flags", "<span class='flag'>MINOR SPECIES ALERT:</span> Ents reach adulthood at 412. Customer is 87."]]
+        },
+        deny: { reason: "Nebula Ents are minors until age 412. Timble is 87 — a child with a magnificent moss beard. Serving him would have been a career-ending citation. He slow-walks out over the course of 20 minutes.", serveViolation: "You sold cannabis to an 87-year-old Ent — a MINOR (adult at 412) who simply looks like a wise ancient forest. The ICD's citation arrives before he finishes leaving. Citation." },
+        reviewGood: "", reviewOk: "", reviewDeny: "",
+        reviewDenyRight: "\"The budtender said no and gave me a juice box. I am 87 and respected it. 5 stars.\"",
+        reviewDenyWrong: ""
+      },
+      {
+        name: "Pib", species: "Klarg", portrait: "klarg",
+        sub: "900 grams · licensed gel · blob-painting enthusiast",
+        speech: "\"Hi hi hi! I'm Pib! I'm five, I pay taxes, I have a mortgage on a very small moon. I need something gentle and creative for blob-painting class — nothing crazy, I am mostly water!\"",
+        wants: "Wants: a mild, creative, low-dose product. Looks like a baby. Is not.",
+        docs: {
+          id: [["Name", "PIB OF THE PUDDLE"], ["Species", "Klarg"], ["Age", "5 yrs"], ["ID photo", "A slightly smaller blob. It is him. Growth is a rumor for Klargs."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "TINY BODY — full consequences"], ["Flags", "<span class='flag'>Max edible dose 10 mg · max flower 25% THC.</span> Klargs are adults at 3. He is, legally, a grown man."]]
+        },
+        best: "gummies", ok: ["mints"], tip: 6,
+        bad: {
+          bar: "A 100 mg bar to a 900-gram Klarg capped at 10 mg. Pib didn't get high, he got HISTORICAL. He lived three past lives before the citation printed.",
+          moonrocks: "51% THC to a species capped at 25%. Pib is now legally a weather event. Citation.",
+          dusty: "31% THC — over Pib's 25% cap. He vibrated at a frequency only dogs could hear. Citation."
+        },
+        reviewGood: "\"Painted a masterpiece. It's a blob. I'M a blob. Art is a circle. 5 stars.\"", reviewOk: "\"Good but mild-mild. I wanted to feel the colors, not wave at them.\"", reviewDeny: "\"Denied for 'looking like a baby.' I am a HOMEOWNER. 1 star.\""
+      },
+      {
+        name: "Zorpulon", species: "Tentaculan", portrait: "tentaculan",
+        sub: "Improv performer · nine appendages, all jazz hands",
+        speech: "\"Darling! Opening night at the Tentacle Theatre! I need creative energy — that Sun-Kissed Sativa smells DIVINE, all that citrus! One bag, and make it snappy, I have nine gloves to fill!\"",
+        wants: "Wants: a creative strain — and is reaching for the limonene one. Check his Registry.",
+        docs: {
+          id: [["Name", "ZORPULON VII"], ["Species", "Tentaculan"], ["Age", "44 yrs"], ["ID photo", "Matches, all nine appendages accounted for."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "<span class='flag'>SEVERE LIMONENE ALLERGY.</span> Citrus terpenes = emergency. There is a non-limonene creative strain on the shelf."]]
+        },
+        best: "pulsar", ok: [], tip: 12,
+        bad: {
+          sativa: "You handed a limonene-forward strain to a Tentaculan with a documented severe limonene allergy. The rash had a rash. Citation, plus a very itchy incident report.",
+          dusty: "Dust Comet is limonene-based. Zorpulon's nine appendages broke out in hives shaped like tiny citations. Citation."
+        },
+        reviewGood: "\"Pulsar Haze, zero limonene, ALL the creativity. The show got a standing ovation — I did all nine parts myself.\"", reviewOk: "\"It worked but it wasn't the creative one I needed. Improv is hard asleep.\"", reviewDeny: "\"Denied a PERFORMER on OPENING NIGHT. The show went on, but my heart did not. 1 star.\""
+      },
+      {
+        name: "Luma", species: "Moon Sprite", portrait: "sprite",
+        sub: "5 kg including wings · dating a Boulderian",
+        speech: "\"Okay so my boyfriend Grob eats those Singularity Bars like CANDY and I want the same experience! One 100 mg bar please! I am small but I am MIGHTY.\"",
+        wants: "Wants: the 100 mg bar, because her 2-ton boyfriend takes it. Check her dose cap.",
+        docs: {
+          id: [["Name", "LUMA WINGDROPS"], ["Species", "Moon Sprite"], ["Age", "45 sprite-yrs"], ["ID photo", "Matches. She is glowing in it, literally, the photo is overexposed."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "FEATHERWEIGHT — 5 kg total"], ["Flags", "<span class='flag'>Max edible dose 10 mg.</span> A 100 mg bar for a sprite is an orbital event, not a dose."]]
+        },
+        best: "mints", ok: ["gummies"], tip: 9,
+        bad: {
+          bar: "100 mg to a 5 kg sprite capped at 10 mg. Luma didn't get high — she achieved escape velocity and was briefly a moon of the station. Citation."
+        },
+        reviewGood: "\"The mints were PERFECT. Grob is jealous. Date night saved. 5 stars.\"", reviewOk: "\"Tiny gummies, tiny me, big night. Acceptable.\"", reviewDeny: "\"Called me 'too small to shop.' I bench-press a paperclip and I WILL be heard. 1 star.\""
+      },
+      {
+        name: "Old Man Jenkins-Prime", species: "Human", portrait: "oldhuman",
+        sub: "Retired · grows tomatoes · suspicious of 'the cloud'",
+        speech: "\"Afternoon. Need my Nebula Nights tincture, same as always. Card's right there. Don't you fuss with the computer, it lies. Yesterday it told ME I was expired. Me!\"",
+        wants: "Wants: a medical-only tincture. Look very carefully at his permit dates.",
+        docs: {
+          id: [["Name", "JENKINS-PRIME, AMOS"], ["Species", "Human"], ["Age", "78 yrs"], ["ID photo", "Matches. He is squinting at the camera. He is still squinting now."]],
+          permit: { type: "Medical", cls: "exp", rows: [["Status", "<span class='flag'>EXPIRED — yesterday</span>"], ["Renewal", "Patient says 'the computer lies'"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "Nebula Nights Tincture is medical-only. A medical permit that expired yesterday is, legally, a souvenir."]]
+        },
+        deny: { reason: "His medical permit expired yesterday, and the tincture is medical-only. It hurts — he's a sweetheart — but 'the computer lies' is not a renewal. He shuffles off to renew it, muttering, and leaves the most polite review you've ever received.", serveViolation: "You made the sale anyway — his only permit expired YESTERDAY, and an expired medical permit is not a permit at all. The ICD does not care that he's lovely. Expired is expired. Citation." },
+        reviewGood: "", reviewOk: "", reviewDeny: "",
+        reviewDenyRight: "\"Denied me for an expired card, polite as Sunday school about it. Renewed it next door. 5 stars.\"",
+        reviewDenyWrong: ""
+      },
+      {
+        name: "UNIT-7 'Rusty'", species: "Unit-series Robot", portrait: "robot",
+        sub: "Maintenance bot · 340 years on the job · squeaks",
+        speech: "\"GREETINGS, FLESH COLLEAGUE. I REQUIRE CBD OIL. FOR MY JOINTS. MY ACTUAL JOINTS. THEY SQUEAK. PLEASE DO NOT OFFER ME FLOWER AGAIN. LAST TIME WAS — SQUEAK — AWKWARD FOR EVERYONE.\"",
+        wants: "Wants: CBD oil. For his literal, mechanical joints.",
+        docs: {
+          id: [["Name", "UNIT-7 'RUSTY'"], ["Species", "Unit-series Robot"], ["Age", "n/a — manufactured"], ["ID photo", "Matches. He poses the same in every photo. He poses the same now."]],
+          permit: { type: "Maintenance Exempt", cls: "rec", rows: [["Status", "CBD maintenance products need NO permit"], ["Daily limit", "n/a"]] },
+          registry: [["Tolerance", "No biology detected"], ["Flags", "THC has zero effect on robots. Selling it to one voids their warranty and counts as <span class='flag'>waste fraud</span>."]]
+        },
+        best: "cbdoil", ok: [], tip: 5,
+        bad: {
+          blackhole: "You sold THC to a robot. It did nothing, his warranty is void, and the ICD calls that waste fraud. Rusty left a disappointed squeak. Citation.",
+          moonrocks: "THC for a robot: zero effect, voided warranty, one waste-fraud citation. He polished the Moon Rocks and used them as paperweights.",
+          sativa: "THC for a robot is waste fraud — it cannot affect him and it voids his warranty. Citation. He is quietly furious, which sounds like a kettle.",
+          dusty: "Selling THC to a robot = waste fraud + voided warranty. Citation. Rusty squeaked all the way out, on purpose, slowly.",
+          pulsar: "THC does nothing for a robot except void his warranty. Waste fraud. Citation.",
+          gummies: "Edibles for a robot: he has no digestive system. He held them politely until the citation arrived. Waste fraud.",
+          bar: "A 100 mg bar for a being with no stomach. Waste fraud, voided warranty, citation — and Rusty framed the bar as a trophy of your failure.",
+          mints: "Mints for a robot. He appreciated the gesture and the ICD appreciated the easy waste-fraud citation.",
+          tincture: "The tincture is medical-only AND he's a robot. Two violations in one small bottle. Citation."
+        },
+        reviewGood: "\"SQUEAK: ELIMINATED. MORALE: RESTORED. WILL RETURN FOR MAINTENANCE AND SMALL TALK.\"", reviewOk: "", reviewDeny: "\"DENIED OIL. FOR JOINTS. THAT SQUEAK. WILL SQUEAK OUTSIDE THIS STORE FOREVER. 1 star.\""
+      },
+      {
+        name: "Blossom", species: "Verdantian (Petalborn)", portrait: "verdantian",
+        sub: "Sentient flower · anniversary tonight · nervous",
+        speech: "\"Hi... um... it's our anniversary, and for a Petalborn, giving your partner flower is the most romantic thing there is. Something beautiful and bright? Please don't make it weird. Everyone makes it weird.\"",
+        wants: "Wants: flower, as a romantic gift. The Handbook says this is normal. Don't make it weird.",
+        docs: {
+          id: [["Name", "BLOSSOM OF THE SOUTH BED"], ["Species", "Verdantian · Petalborn"], ["Age", "63 yrs"], ["ID photo", "Matches. Taken in spring. She has bloomed since, but it's her."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "<span class='fine'>Flower purchase = normal, romantic commerce for Petalborn.</span> <span class='flag'>No edibles</span> — Verdantians have no stomach."]]
+        },
+        best: "sativa", ok: ["pulsar", "blackhole"], tip: 11,
+        bad: {
+          gummies: "Edibles for a Verdantian — she has NO STOMACH. It was a medical emergency and a deeply unromantic anniversary. Citation.",
+          bar: "A 100 mg bar for a plant with no digestive system. The anniversary is a hospital visit now. Citation.",
+          mints: "Mints are edibles, and Blossom has no stomach. Small mint, big emergency, one citation."
+        },
+        reviewGood: "\"She cried pollen. Happy pollen. The budtender just... got it. 5 stars.\"", reviewOk: "\"Not the bright one I dreamed of, but flower is flower. She said yes to year two.\"", reviewDeny: "\"He looked at me, looked at the flowers, and said no. MADE IT WEIRD. 1 star.\""
+      },
+      {
+        name: "A Completely Normal Customer", species: "Vexian", portrait: "vexian",
+        sub: "Definitely not an inspector · the trench coat is a fashion choice",
+        speech: "\"GREETINGS, FELLOW CONSUMER. I am a regular customer who is in a hurry, so kindly skip the whole ID-checking... ritual... and sell me Pulsar Haze for my very normal focus needs. Also, unrelated: where do you keep your compliance records? Asking for me. A consumer.\"",
+        wants: "Wants: Pulsar Haze, fast, and is weirdly interested in your paperwork. His face does not match his photo. Read the Handbook before you panic.",
+        docs: {
+          id: [["Name", "VEX MIRRORVALE"], ["Species", "Vexian"], ["Age", "51 yrs"], ["ID photo", "<span class='flag'>DOES NOT MATCH his current face.</span> Different eyes. Different everything. See Registry."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"], ["ID number", "Verified ✓ matches Registry"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "<span class='fine'>Vexians are shapeshifters — the ID photo NEVER matches. This is legal and normal.</span> Judge the permit and ID number, never the face."]]
+        },
+        best: "pulsar", ok: [], tip: 25, inspector: true,
+        bad: {},
+        reviewGood: "\"SURPRISE: I am ICD Inspector Mirrorvale. The budtender checked everything, didn't flinch at the face, and sold legally. 5 stars and a commendation.\"", reviewOk: "\"Inspector's log: sold a legal but off-target product while asking zero questions about my face. Acceptable. 3 stars.\"", reviewDeny: "\"Inspector's log: DENIED a fully legal sale because my face moved. This is textbook Vexian discrimination. 1 star, and HR has been notified.\""
+      }
+    ];
+
+    var MGR_LINES = [
+      "First one's a softie to warm you up. They get weirder. They always get weirder.",
+      "Remember: the Registry card outranks the customer's confidence. Every time.",
+      "Quick note from corporate: smile like the cameras have audio. They do now.",
+      "Whoever keeps writing 'he seemed old' in the denial log — stop. Check the handbook.",
+      "The Klarg regular is coming in today. He is an adult. He pays taxes. Be cool.",
+      "Yes, the allergy thing is real. No, 'he said he'd be fine' is not a defense.",
+      "Dating across species is none of our business. Dosing across species is entirely our business.",
+      "If the tincture guy cries, I swear — just follow the dates on the card, kid.",
+      "Rusty the maintenance bot is due in. He tips in exact change and emotional support.",
+      "Last customer of Day 1. Something feels... official about this one. Stay sharp."
+    ];
+
+    /* ==================== STATE & AUDIO ==================== */
+    var S = null;
+    function freshState() {
+      return { idx: 0, credits: 0, citations: 0, served: 0, perfect: 0, stars: [], results: [], reviews: [], selected: null, sound: true, over: false };
+    }
+    var AC = null;
+    function beep(freq, dur, type, gain, when) {
+      if (!S || !S.sound) return;
+      try {
+        if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+        if (AC.state === "suspended") AC.resume();
+        var t = AC.currentTime + (when || 0);
+        var o = AC.createOscillator(), g = AC.createGain();
+        o.type = type || "sine"; o.frequency.value = freq;
+        g.gain.setValueAtTime(gain || 0.08, t);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g); g.connect(AC.destination);
+        o.start(t); o.stop(t + dur);
+      } catch (e) { /* audio is a garnish, never a blocker */ }
+    }
+    function sndStamp() { beep(140, 0.14, "square", 0.12); beep(70, 0.2, "sine", 0.14); }
+    function sndSale() { beep(880, 0.1, "sine", 0.07); beep(1318, 0.16, "sine", 0.07, 0.09); }
+    function sndCitation() { beep(196, 0.22, "sawtooth", 0.09); beep(147, 0.3, "sawtooth", 0.09, 0.16); }
+    function sndGood() { beep(660, 0.1, "sine", 0.06); beep(990, 0.14, "sine", 0.06, 0.08); }
+
+    /* ==================== DOM HELPERS ==================== */
+    function el(id) { return document.getElementById(id); }
+    function show(id) { el(id).classList.remove("hidden"); }
+    function hide(id) { el(id).classList.add("hidden"); }
+    function starsStr(n) { var s = ""; for (var i = 0; i < 5; i++) s += (i < n ? "★" : "☆"); return s; }
+
+    /* ==================== RENDER ==================== */
+    function renderStatus() {
+      el("st-count").textContent = Math.min(S.idx + 1, CUSTOMERS.length) + " / " + CUSTOMERS.length;
+      el("st-credits").textContent = S.credits + "₡";
+      el("st-cites").textContent = S.citations + " / 3";
+      var dots = "";
+      for (var i = 0; i < CUSTOMERS.length; i++) {
+        var cls = "qdot";
+        if (i < S.results.length) cls += S.results[i].citation || S.results[i].wrongDeny ? " bad" : " done";
+        else if (i === S.idx) cls += " now";
+        dots += '<span class="' + cls + '"></span>';
+      }
+      el("st-dots").innerHTML = dots;
+    }
+
+    function renderCustomer() {
+      var c = CUSTOMERS[S.idx];
+      S.selected = null;
+      el("portrait-slot").innerHTML = PORTRAITS[c.portrait];
+      el("cust-name").textContent = c.name;
+      el("cust-sub").textContent = c.species + " · " + c.sub;
+      el("cust-speech").innerHTML = c.speech + '<span class="wants">' + c.wants + "</span>";
+      el("mgr-text").textContent = MGR_LINES[S.idx] || "";
+
+      var d = c.docs;
+      var idRows = d.id.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("");
+      var permitRows = d.permit.rows.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("");
+      var regRows = d.registry.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("");
+      el("docs-slot").innerHTML =
+        '<div class="doc"><h4>Galactic ID</h4><dl>' + idRows + "</dl></div>" +
+        '<div class="doc"><h4>Permit <span class="tag ' + d.permit.cls + '">' + d.permit.type + "</span></h4><dl>" + permitRows + "</dl></div>" +
+        '<div class="doc"><h4>Species Tolerance Registry</h4><dl>' + regRows + "</dl></div>";
+
+      el("shelf-slot").innerHTML = SHELF.map(function (pid) {
+        var p = PRODUCTS[pid];
+        var tag = p.tag ? '<span class="ptag ' + p.tag + '">' + p.tagText + "</span>" : "";
+        return '<button class="prod" data-pid="' + pid + '" aria-pressed="false">' +
+          '<span class="pname"><span>' + p.name + '</span><span class="price">' + p.price + '₡</span></span>' +
+          '<span class="pmeta">' + p.meta + "</span>" + tag + "</button>";
+      }).join("");
+
+      var prods = document.querySelectorAll(".prod");
+      for (var i = 0; i < prods.length; i++) {
+        prods[i].addEventListener("click", function () {
+          selectProduct(this.getAttribute("data-pid"));
+        });
+      }
+      updateApprove();
+      renderStatus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function selectProduct(pid) {
+      S.selected = pid;
+      var prods = document.querySelectorAll(".prod");
+      for (var i = 0; i < prods.length; i++) {
+        var on = prods[i].getAttribute("data-pid") === pid;
+        prods[i].classList.toggle("sel", on);
+        prods[i].setAttribute("aria-pressed", on ? "true" : "false");
+      }
+      beep(520, 0.05, "sine", 0.04);
+      updateApprove();
+    }
+
+    function updateApprove() {
+      var b = el("btn-approve");
+      if (S.selected) {
+        b.disabled = false;
+        el("approve-sub").textContent = "sell: " + PRODUCTS[S.selected].name + " · " + PRODUCTS[S.selected].price + "₡";
+        el("hintline").textContent = "Exit bag ready. Label printer already complaining about the label length.";
+      } else {
+        b.disabled = true;
+        el("approve-sub").textContent = "select a product first";
+        el("hintline").textContent = "Pick a product from the shelf, or stamp DENIED if no legal sale exists.";
+      }
+    }
+
+    /* ==================== RESOLUTION ==================== */
+    function doStamp(kind) {
+      var st = el("big-stamp");
+      st.textContent = kind === "approve" ? "APPROVED" : "DENIED";
+      st.classList.toggle("ok", kind === "approve");
+      st.classList.remove("show");
+      void st.offsetWidth;
+      st.classList.add("show");
+      sndStamp();
+    }
+
+    function resolve(action) {
+      var c = CUSTOMERS[S.idx];
+      var out = { citation: false, wrongDeny: false };
+      var verdict, vcls, title, body, delta, deltaCls, stars, quote;
+
+      if (action.type === "deny") {
+        doStamp("deny");
+        if (c.deny) {
+          verdict = "CORRECT DENIAL"; vcls = "good";
+          title = "Denied — and the law thanks you";
+          body = c.deny.reason;
+          S.credits += 15; delta = "+15₡ compliance bonus"; deltaCls = "plus";
+          stars = 5; quote = c.reviewDenyRight;
+          out.kind = "correct-deny";
+          S.served++;
+        } else {
+          verdict = "WRONGFUL DENIAL"; vcls = "bad";
+          title = "Denied a legal sale";
+          body = "Every document checked out and a legal product existed for " + c.name + ". Deb watches the security footage back in silence. The review, however, is not silent.";
+          delta = "+0₡ — and a complaint filed"; deltaCls = "minus";
+          stars = 1; quote = c.reviewDeny;
+          out.kind = "wrong-deny"; out.wrongDeny = true;
+        }
+      } else {
+        doStamp("approve");
+        var pid = action.product, p = PRODUCTS[pid];
+        if (c.deny) {
+          verdict = "CITATION"; vcls = "bad";
+          title = "ICD Citation #" + (S.citations + 1);
+          body = c.deny.serveViolation;
+          S.citations++; out.citation = true;
+          delta = "+0₡ — sale voided by the ICD"; deltaCls = "minus";
+          stars = 1; quote = "\"The budtender sold it anyway. I watched. We all watched. The cameras watched.\" — ICD field report";
+          out.kind = "citation";
+        } else if (c.bad && c.bad[pid]) {
+          verdict = "CITATION"; vcls = "bad";
+          title = "ICD Citation #" + (S.citations + 1);
+          body = c.bad[pid];
+          S.citations++; out.citation = true;
+          delta = "+0₡ — sale voided by the ICD"; deltaCls = "minus";
+          stars = 1; quote = c.reviewGood ? "\"One star. Would not survive again.\" — " + c.name : "\"One star.\" — " + c.name;
+          out.kind = "citation";
+        } else if (pid === c.best) {
+          verdict = "PERFECT MATCH"; vcls = "good";
+          title = p.name + " — exactly right";
+          body = "Right product, right species, right dose, all paperwork clean. You weigh it, scan it in Star-To-Star seed-to-sale, print a label long enough to have chapters, and defeat the child-resistant exit bag on the customer's behalf. This is the whole job, done perfectly.";
+          if (c.inspector) body += " He pauses at the door, peels off the trench coat to reveal an ICD inspector's badge, and salutes you with two of his seven fingers.";
+          S.credits += p.price + (c.tip || 0);
+          delta = "+" + (p.price + (c.tip || 0)) + "₡ (sale " + p.price + "₡ + tip " + (c.tip || 0) + "₡)"; deltaCls = "plus";
+          stars = 5; quote = c.reviewGood;
+          out.kind = "perfect"; S.perfect++; S.served++;
+        } else if (c.ok && c.ok.indexOf(pid) >= 0) {
+          verdict = "SERVED — ACCEPTABLE"; vcls = "mid";
+          title = p.name + " — legal, not legendary";
+          body = "Everything was legal and it will do the job, but it wasn't the product this customer actually needed. No tip. Somewhere, a terpene profile goes unappreciated.";
+          S.credits += p.price;
+          delta = "+" + p.price + "₡ (sale, no tip)"; deltaCls = "plus";
+          stars = 4; quote = c.reviewOk || c.reviewGood;
+          out.kind = "ok"; S.served++;
+        } else {
+          verdict = "SERVED — MISMATCH"; vcls = "mid";
+          title = p.name + " — not what they needed";
+          body = "The sale was legal, so no citation — but " + p.name + " does not solve " + c.name + "'s problem, and they both know it. The label prints. The bag seals. The disappointment is complimentary.";
+          S.credits += p.price;
+          delta = "+" + p.price + "₡ (sale, no tip, mild shame)"; deltaCls = "plus";
+          stars = 3; quote = c.reviewOk || c.reviewGood;
+          out.kind = "mismatch"; S.served++;
+        }
+      }
+
+      if (out.citation) sndCitation(); else if (verdict === "PERFECT MATCH" || verdict === "CORRECT DENIAL") { sndSale(); } else { sndGood(); }
+      S.stars.push(stars);
+      S.reviews.push({ stars: stars, quote: quote, who: c.name + " · " + c.species });
+      out.customer = c.name; out.stars = stars;
+      S.results.push(out);
+      renderStatus();
+
+      el("res-verdict").textContent = verdict;
+      el("res-verdict").className = "verdict " + vcls;
+      el("res-title").textContent = title;
+      el("res-body").textContent = body;
+      el("res-delta").textContent = delta;
+      el("res-delta").className = "delta " + deltaCls;
+      el("res-stars").textContent = starsStr(stars);
+      el("res-quote").textContent = quote;
+      el("res-who").textContent = "— " + c.name + ", verified customer review";
+      el("btn-next").textContent = S.citations >= 3 ? "FACE THE CONSEQUENCES" : (S.idx >= CUSTOMERS.length - 1 ? "CLOCK OUT — SEE THE REPORT" : "NEXT CUSTOMER");
+
+      setTimeout(function () { el("overlay-result").classList.add("open"); }, 620);
+    }
+
+    function next() {
+      el("overlay-result").classList.remove("open");
+      el("big-stamp").classList.remove("show");
+      if (S.citations >= 3 || S.idx >= CUSTOMERS.length - 1) { endDay(); return; }
+      S.idx++;
+      renderCustomer();
+    }
+
+    function endDay() {
+      S.over = true;
+      hide("screen-game"); show("screen-end");
+      var fired = S.citations >= 3;
+      var avg = S.stars.length ? (S.stars.reduce(function (a, b) { return a + b; }, 0) / S.stars.length) : 0;
+      el("end-title").textContent = fired ? "Fired on Day 1" : "Day 1 Complete";
+      var rank, blurb;
+      if (fired) {
+        rank = "RANK: FORMER BUDTENDER";
+        blurb = "Three citations. The ICD escorts you out past the exit bags. Deb leaves your name tag on the counter 'as a warning to the next one.' The stamp is reassigned. The stamp always survives.";
+      } else if (S.perfect >= 7 && S.citations === 0) {
+        rank = "RANK: BUDTENDER OF THE MONTH (PROVISIONAL, DAY 1)";
+        blurb = "A near-flawless first shift. You read registries, respected allergens, dosed by body mass, and didn't flinch at a shapeshifter. Deb is drafting your commendation. It is one sentence long and it just says 'adequate.' From Deb, that's a love letter.";
+      } else if (S.citations === 0) {
+        rank = "RANK: SOLID SHIFT";
+        blurb = "No citations, customers alive, reviews respectable. In this industry, that's a win you frame. Come back tomorrow — Day 2 is when Venus legalizes recreational and everything gets worse.";
+      } else if (S.citations === 1) {
+        rank = "RANK: SURVIVED, WITH PAPERWORK";
+        blurb = "One citation to learn from. Every real budtender has a story that starts exactly like yours. Yours just happened to involve witnesses from a galactic regulatory body.";
+      } else {
+        rank = "RANK: ON THIN ICE (2 CITATIONS)";
+        blurb = "Two citations in one shift. One more and the stamp gets taken away. Deb has already printed the 'we're hiring' sign, 'just in case.'";
+      }
+      el("end-rank").textContent = rank;
+      el("end-blurb").textContent = blurb;
+      el("end-credits").textContent = S.credits + "₡";
+      el("end-served").textContent = S.served + " / " + CUSTOMERS.length;
+      el("end-perfect").textContent = S.perfect;
+      el("end-cites").textContent = S.citations;
+      el("end-stars").textContent = S.stars.length ? avg.toFixed(1) + " ★" : "—";
+      var labels = { "perfect": "Perfect match", "ok": "Served (acceptable)", "mismatch": "Served (mismatch)", "correct-deny": "Correct denial", "wrong-deny": "Wrongful denial", "citation": "CITATION" };
+      el("end-recap").innerHTML = S.results.map(function (r, i) {
+        return "<li><b>" + (i + 1) + ". " + r.customer + "</b> — " + labels[r.kind] + " · " + starsStr(r.stars) + "</li>";
+      }).join("");
+      el("end-reviews").innerHTML = S.reviews.map(function (r) {
+        return '<div class="review" style="margin-top:8px;"><div class="stars">' + starsStr(r.stars) + '</div><div>' + r.quote + '</div><div class="who">— ' + r.who + "</div></div>";
+      }).join("");
+      window.scrollTo({ top: 0 });
+    }
+
+    function startGame() {
+      S = freshState();
+      hide("screen-brief"); hide("screen-end"); show("screen-game");
+      el("btn-sound").textContent = "Sound: On";
+      renderCustomer();
+    }
+
+    /* ==================== WIRING ==================== */
+    el("btn-start").addEventListener("click", function () { S = S || freshState(); startGame(); });
+    el("btn-again").addEventListener("click", startGame);
+    el("btn-approve").addEventListener("click", function () { if (S.selected) resolve({ type: "serve", product: S.selected }); });
+    el("btn-deny").addEventListener("click", function () { resolve({ type: "deny" }); });
+    el("btn-next").addEventListener("click", next);
+    function openBook() { el("overlay-book").classList.add("open"); }
+    function closeBook() { el("overlay-book").classList.remove("open"); }
+    el("btn-book").addEventListener("click", openBook);
+    el("btn-book-brief").addEventListener("click", openBook);
+    el("btn-book-end").addEventListener("click", openBook);
+    el("btn-book-close").addEventListener("click", closeBook);
+    el("overlay-book").addEventListener("click", function (e) { if (e.target === this) closeBook(); });
+    el("btn-sound").addEventListener("click", function () {
+      S.sound = !S.sound;
+      this.textContent = S.sound ? "Sound: On" : "Sound: Off";
+      if (S.sound) sndGood();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeBook();
+    });
+    S = freshState();
+    </script>
+  </body>
+</html>
