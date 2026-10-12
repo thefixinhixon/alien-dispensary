@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="data:," />
-    <title>Alien Dispensary — Day 1</title>
+    <title>Alien Dispensary — Days 1 &amp; 2</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sometype+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -277,6 +277,19 @@
       .recap { font-size: .92rem; }
       .recap li { margin: 5px 0; }
       .rank { font-family: "Chakra Petch", sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent-ink); }
+      .day-tabs { display: flex; gap: 8px; justify-content: center; padding: 16px 18px 0; flex-wrap: wrap; }
+      .day-tab {
+        background: var(--panel-2); border: 1.5px solid var(--line); color: var(--ink);
+        border-radius: 999px; padding: 8px 20px; font-family: "Chakra Petch", sans-serif;
+        font-weight: 700; letter-spacing: .06em; font-size: .92rem;
+      }
+      .day-tab:hover { border-color: var(--accent); }
+      .day-tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+      @media (prefers-color-scheme: dark) { .day-tab.on { color: #06130b; } }
+      .recall-box {
+        border: 2px solid var(--red); background: var(--red-soft); border-radius: 10px;
+        padding: 10px 14px; margin: 0 0 14px; font-size: .92rem;
+      }
       .hidden { display: none !important; }
       footer.note { text-align: center; color: var(--ink-soft); font-size: .8rem; margin-top: 22px; }
     </style>
@@ -286,48 +299,17 @@
       <!-- ======================= BRIEFING ======================= -->
       <section id="screen-brief" class="card">
         <div class="hero">
-          <div class="over">The Greenery Room · Orbital Station 7 · Now Hiring (Desperate)</div>
+          <div class="over" id="brief-over">The Greenery Room · Orbital Station 7 · Now Hiring (Desperate)</div>
           <h1>ALIEN <span>DISPENSARY</span></h1>
-          <p class="lede">You are the only human budtender on the station — hired because humans are the one species that doesn't explode, molt, achieve telepathy, or enter a 40-year hibernation from a 10&nbsp;mg gummy. Ten customers. One counter. A stamp with your name on it.</p>
+          <p class="lede" id="brief-lede"></p>
         </div>
-        <div class="brief-grid">
-          <div class="brief-box">
-            <h3>HOW A SHIFT WORKS</h3>
-            <ul class="tight">
-              <li><b>Read the request.</b> Customers describe their problems terribly. That's the job.</li>
-              <li><b>Check the documents.</b> Galactic ID, permit, and the Species Tolerance Registry. Something is usually off.</li>
-              <li><b>Pick a product</b> from the shelf that matches their need, their species, and the law — or don't sell at all.</li>
-              <li><b>Stamp it.</b> APPROVED sells your selected product. DENIED sends them away. Both can be right. Both can end your career.</li>
-            </ul>
-          </div>
-          <div class="brief-box">
-            <h3>DAY 1 RULES — THE SHORT VERSION</h3>
-            <ul class="tight">
-              <li>Adult age is <b>different for every species</b>. A 5-year-old Klarg is a grown taxpayer. An 87-year-old Nebula Ent is a child.</li>
-              <li><b>Medical-only products</b> need a valid, unexpired medical permit.</li>
-              <li>The Registry flags hard limits — THC caps, edible dose caps, allergens. <b>Registry beats customer confidence.</b></li>
-              <li><b>3 citations from the ICD</b> (Intergalactic Compliance Division) and you're fired. The stamp giveth, the stamp taketh away.</li>
-            </ul>
-          </div>
-          <div class="brief-box">
-            <h3>SCORING</h3>
-            <ul class="tight">
-              <li>Perfect match: sale + tip. Wrong-but-legal product: sale, no tip, side-eye.</li>
-              <li>Correct denial: +15₡ compliance bonus. Wrongful denial: a 1-star review with your name in it.</li>
-              <li>Illegal sale: citation. Yes, even if they were really nice about it.</li>
-            </ul>
-          </div>
-          <div class="brief-box">
-            <h3>FROM YOUR MANAGER, DEB</h3>
-            <ul class="tight">
-              <li>"Welcome aboard. The handbook button is right under Clock In — and there's another one on the counter all shift. Read it, it's the whole job."</li>
-              <li>"Do NOT upsell the loyalty program to anyone who is actively molting."</li>
-              <li>"If someone says 'my cousin's a budtender on Colorado Prime,' that is not a medical permit."</li>
-            </ul>
-          </div>
+        <div class="day-tabs" role="tablist" aria-label="Choose a day">
+          <button class="day-tab on" id="tab-day-0" data-day="0" role="tab" aria-selected="true">DAY 1</button>
+          <button class="day-tab" id="tab-day-1" data-day="1" role="tab" aria-selected="false">DAY 2 — NEW RULES, WORSE CUSTOMERS</button>
         </div>
+        <div class="brief-grid" id="brief-boxes"></div>
         <div style="text-align:center; padding: 0 18px 26px;">
-          <button class="btn" id="btn-start" style="font-size:1.1rem; padding: 14px 34px;">CLOCK IN — START DAY 1</button>
+          <button class="btn" id="btn-start" style="font-size:1.1rem; padding: 14px 34px;">CLOCK IN</button>
           <div style="margin-top:10px;"><button class="icon-btn" id="btn-book-brief">Open the Species Handbook</button></div>
         </div>
       </section>
@@ -336,7 +318,7 @@
       <section id="screen-game" class="hidden">
         <div class="statusbar">
           <div class="brand">ALIEN <span>DISPENSARY</span></div>
-          <div class="stat"><span class="lbl">Shift</span><b>Day 1</b></div>
+          <div class="stat"><span class="lbl">Shift</span><b id="st-day">Day 1</b></div>
           <div class="stat"><span class="lbl">Customer</span><b id="st-count">1 / 10</b></div>
           <div class="queue-dots" id="st-dots" aria-hidden="true"></div>
           <div class="spacer"></div>
@@ -397,39 +379,19 @@
         <div id="end-reviews"></div>
         <div class="btn-row">
           <button class="btn" id="btn-again">WORK ANOTHER DAY 1</button>
+          <button class="btn" id="btn-nextday">CONTINUE TO DAY 2 →</button>
           <button class="btn ghost" id="btn-book-end">Re-read the Handbook</button>
         </div>
       </section>
 
-      <footer class="note">A Day 1 prototype. No aliens were over-served in the making of this shift.</footer>
+      <footer class="note">A Days 1–2 prototype. No aliens were over-served in the making of these shifts.</footer>
     </div>
 
     <!-- ======================= HANDBOOK MODAL ======================= -->
     <div class="overlay" id="overlay-book" role="dialog" aria-modal="true" aria-label="Species handbook">
       <div class="sheet">
-        <h2>Species Handbook — Day 1 Edition</h2>
-        <p style="color:var(--ink-soft); margin-top:0;">Galactic Federation standard reference. Updated this morning, obviously, just to keep you on your toes. The Registry card on the counter always overrides this page for an individual customer.</p>
-        <table class="rules-table">
-          <thead><tr><th>Species</th><th>Adult at</th><th>Know this</th></tr></thead>
-          <tbody>
-            <tr><td><b>Human</b></td><td>21 yrs</td><td>Standard everything. Terrified of being seen buying weed by anyone from their home planet.</td></tr>
-            <tr><td><b>Boulderian</b></td><td>20 cycles</td><td>Two tons of living rock. Enormous tolerance. Doses that would crater a village are a light snack.</td></tr>
-            <tr><td><b>Nebula Ent</b></td><td>412 yrs</td><td>Treefolk. Look ancient at every age. An 87-year-old Ent is a minor no matter how wise the beard of moss looks.</td></tr>
-            <tr><td><b>Klarg</b></td><td>3 yrs</td><td>900-gram sentient gel. Adults look exactly like babies of every other species. Max edible dose 10&nbsp;mg, max flower 25% THC — small body, full consequences.</td></tr>
-            <tr><td><b>Tentaculan</b></td><td>18 yrs</td><td><b>Limonene is a severe allergen.</b> Citrus terps = citation + a very dramatic rash in 9 appendages.</td></tr>
-            <tr><td><b>Moon Sprite</b></td><td>30 sprite-yrs</td><td>Weighs about 5&nbsp;kg with the wings. Max edible dose 10&nbsp;mg. A 100&nbsp;mg bar is not a dose, it's an orbital event.</td></tr>
-            <tr><td><b>Verdantian</b></td><td>50 yrs</td><td>Sentient plants. Buying flower is normal, polite commerce (for Petalborn subspecies it's romantic). No stomach — edibles are a medical emergency, not a snack.</td></tr>
-            <tr><td><b>Unit-series Robot</b></td><td>n/a</td><td>Not biological. CBD oil is a maintenance product — no permit needed. Selling them THC voids their warranty and counts as waste fraud.</td></tr>
-            <tr><td><b>Vexian</b></td><td>25 yrs</td><td>Shapeshifters. Their ID photo <b>never</b> matches their current face. That is legal and normal. Judge the permit and ID number, never the face.</td></tr>
-          </tbody>
-        </table>
-        <h3>Standing rules</h3>
-        <ul class="tight">
-          <li><b>Medical-only</b> products (tagged on the shelf) require a medical permit that is <b>valid today</b>. "It expired yesterday" is expired.</li>
-          <li>Registry flags — THC caps, dose caps, allergens — are hard law, not suggestions. The customer's confidence is not evidence.</li>
-          <li>Recreational permit covers everything not tagged medical-only. No permit at all = no sale, full stop.</li>
-          <li>Three ICD citations in a shift and you're fired on the spot. Deb will not cry. Deb never cries.</li>
-        </ul>
+        <h2 id="book-title">Species Handbook</h2>
+        <div id="book-body"></div>
         <div class="btn-row"><button class="btn" id="btn-book-close">BACK TO THE COUNTER</button></div>
       </div>
     </div>
@@ -477,7 +439,15 @@
       oldhuman: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Elderly human customer"><circle cx="100" cy="88" r="46" fill="#eec39e" stroke="#bd8f5f" stroke-width="3"/><path d="M54 80 Q52 40 100 40 Q148 40 146 80 Q146 56 100 54 Q54 56 54 80" fill="#e8e8e8"/><circle cx="82" cy="90" r="13" fill="none" stroke="#44546a" stroke-width="3"/><circle cx="118" cy="90" r="13" fill="none" stroke="#44546a" stroke-width="3"/><path d="M95 90 L105 90" stroke="#44546a" stroke-width="3"/><path d="M84 124 Q100 132 116 122" stroke="#7a5a3a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M66 132 Q100 152 134 132 L138 170 Q100 184 62 170 Z" fill="#e8e8e8" opacity=".85"/></svg>',
       robot: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Unit-series robot"><rect x="56" y="56" width="88" height="76" rx="14" fill="#aeb9c2" stroke="#67727c" stroke-width="3"/><rect x="68" y="78" width="64" height="20" rx="9" fill="#20303c"/><circle cx="86" cy="88" r="6" fill="#7fe0a8"/><circle cx="114" cy="88" r="6" fill="#ffb84a"/><path d="M78 116 L122 116" stroke="#67727c" stroke-width="4" stroke-linecap="round"/><path d="M100 56 L100 34" stroke="#67727c" stroke-width="4"/><circle cx="100" cy="28" r="7" fill="#ff6b61"/><rect x="44" y="84" width="12" height="26" rx="5" fill="#8d99a6"/><rect x="144" y="84" width="12" height="26" rx="5" fill="#8d99a6"/><path d="M70 132 L66 168 M130 132 L134 168" stroke="#67727c" stroke-width="8" stroke-linecap="round"/><circle cx="164" cy="150" r="4" fill="#ffb84a"/><circle cx="36" cy="140" r="3" fill="#ffb84a"/></svg>',
       verdantian: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Verdantian, a sentient plant"><path d="M100 108 L100 182" stroke="#4d7c43" stroke-width="10" stroke-linecap="round"/><path d="M100 150 Q66 140 58 112 Q92 116 100 150 M100 160 Q136 152 142 122 Q108 128 100 160" fill="#5d8a4a"/><g fill="#e77fa2" stroke="#c4527c" stroke-width="2"><ellipse cx="100" cy="46" rx="11" ry="24"/><ellipse cx="66" cy="64" rx="11" ry="24" transform="rotate(-52 66 64)"/><ellipse cx="134" cy="64" rx="11" ry="24" transform="rotate(52 134 64)"/><ellipse cx="74" cy="96" rx="10" ry="20" transform="rotate(-96 74 96)"/><ellipse cx="126" cy="96" rx="10" ry="20" transform="rotate(96 126 96)"/></g><circle cx="100" cy="76" r="21" fill="#f6c445" stroke="#d9a83f" stroke-width="2"/><circle cx="93" cy="74" r="3.4" fill="#20303c"/><circle cx="107" cy="74" r="3.4" fill="#20303c"/><path d="M93 86 Q100 91 107 85" stroke="#20303c" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
-      vexian: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Vexian shapeshifter, mid-shift"><path d="M100 42 a46 50 0 0 1 0 100 Z" fill="#c9a1e0"/><path d="M100 42 a46 50 0 0 0 0 100 Z" fill="#7fc7a5"/><ellipse cx="100" cy="92" rx="46" ry="50" fill="none" stroke="#54655c" stroke-width="3"/><circle cx="82" cy="88" r="5" fill="#20303c"/><circle cx="120" cy="84" r="7" fill="#20303c"/><circle cx="120" cy="84" r="3" fill="#ffd7e7"/><path d="M84 118 Q102 126 118 112" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M100 42 L100 142" stroke="#54655c" stroke-width="2" stroke-dasharray="4 5"/><circle cx="66" cy="66" r="4" fill="#c9a1e0"/><circle cx="140" cy="120" r="5" fill="#7fc7a5"/></svg>'
+      vexian: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Vexian shapeshifter, mid-shift"><path d="M100 42 a46 50 0 0 1 0 100 Z" fill="#c9a1e0"/><path d="M100 42 a46 50 0 0 0 0 100 Z" fill="#7fc7a5"/><ellipse cx="100" cy="92" rx="46" ry="50" fill="none" stroke="#54655c" stroke-width="3"/><circle cx="82" cy="88" r="5" fill="#20303c"/><circle cx="120" cy="84" r="7" fill="#20303c"/><circle cx="120" cy="84" r="3" fill="#ffd7e7"/><path d="M84 118 Q102 126 118 112" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M100 42 L100 142" stroke="#54655c" stroke-width="2" stroke-dasharray="4 5"/><circle cx="66" cy="66" r="4" fill="#c9a1e0"/><circle cx="140" cy="120" r="5" fill="#7fc7a5"/></svg>',
+      hivemind: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="The Hive Mind — many small drones in one trench coat"><path d="M58 192 L66 92 L134 92 L142 192 Z" fill="#b09a68" stroke="#7d6a42" stroke-width="3"/><path d="M66 92 L100 128 L134 92" fill="none" stroke="#7d6a42" stroke-width="3"/><path d="M100 128 L100 192" stroke="#7d6a42" stroke-width="3"/><rect x="88" y="146" width="24" height="8" fill="#7d6a42"/><ellipse cx="100" cy="58" rx="40" ry="34" fill="#e8c86a" stroke="#b8943c" stroke-width="3"/><circle cx="76" cy="48" r="5.5" fill="#20303c"/><circle cx="94" cy="42" r="5.5" fill="#20303c"/><circle cx="112" cy="42" r="5.5" fill="#20303c"/><circle cx="126" cy="50" r="5.5" fill="#20303c"/><circle cx="84" cy="62" r="5.5" fill="#20303c"/><circle cx="104" cy="60" r="5.5" fill="#20303c"/><circle cx="120" cy="66" r="5.5" fill="#20303c"/><circle cx="68" cy="64" r="4.5" fill="#20303c"/><path d="M84 82 Q100 88 116 82" stroke="#20303c" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M60 30 Q44 12 58 8 M140 30 Q156 12 142 8" stroke="#b8943c" stroke-width="3" fill="none"/></svg>',
+      venusian: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Venusian, a photosynthetic plant person"><g stroke="#e8bc4a" stroke-width="4" stroke-linecap="round"><path d="M100 8 L100 22 M40 26 L50 36 M160 26 L150 36 M24 78 L38 80 M176 78 L162 80"/></g><path d="M64 60 Q38 34 62 22 Q84 38 64 60 M136 60 Q162 34 138 22 Q116 38 136 60 M100 44 Q100 12 126 12 Q128 40 100 44" fill="#4d8a4a"/><circle cx="100" cy="98" r="42" fill="#8fce7f" stroke="#5d9c52" stroke-width="3"/><path d="M70 76 Q100 60 130 76" stroke="#5d9c52" stroke-width="3" fill="none" opacity=".7"/><circle cx="85" cy="96" r="5" fill="#20303c"/><circle cx="115" cy="96" r="5" fill="#20303c"/><circle cx="72" cy="110" r="6" fill="#f2a7c3" opacity=".7"/><circle cx="128" cy="110" r="6" fill="#f2a7c3" opacity=".7"/><path d="M88 118 Q100 126 112 117" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M78 140 L74 182 M122 140 L126 182 M78 140 Q100 152 122 140" stroke="#5d9c52" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M74 168 Q52 160 50 140 Q70 146 74 168 M126 168 Q148 160 150 140 Q130 146 126 168" fill="#4d8a4a"/></svg>',
+      cowboy: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Neo-Texas tourist in a cowboy hat, sweating"><circle cx="100" cy="94" r="42" fill="#e8b58e" stroke="#b57f52" stroke-width="3"/><path d="M28 78 Q100 52 172 78 Q174 92 100 88 Q26 92 28 78 Z" fill="#8a5a2e"/><path d="M58 76 L64 40 Q100 26 136 40 L142 76 Q100 64 58 76 Z" fill="#a06a35" stroke="#8a5a2e" stroke-width="2"/><rect x="62" y="64" width="76" height="8" fill="#5d3c1a"/><circle cx="83" cy="96" r="4.5" fill="#20303c"/><circle cx="117" cy="96" r="4.5" fill="#20303c"/><path d="M84 82 L94 86 M116 82 L106 86" stroke="#7a4a20" stroke-width="3" stroke-linecap="round"/><path d="M88 122 Q100 116 112 122" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M138 92 Q146 104 138 112 Q130 104 138 92" fill="#7fb2e0"/><path d="M60 108 Q54 118 60 124 Q66 118 60 108" fill="#7fb2e0"/><path d="M64 188 L72 146 Q100 134 128 146 L136 188 Z" fill="#7a2e2e"/><path d="M100 146 L100 188" stroke="#5d1f1f" stroke-width="3"/></svg>',
+      catperson: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Quantum Felinoid, a cat person in a box"><path d="M52 84 L40 34 L84 56 Z M148 84 L160 34 L116 56 Z" fill="#c98d4e" stroke="#9c6a30" stroke-width="3"/><path d="M56 76 L50 46 L76 58 Z M144 76 L150 46 L124 58 Z" fill="#f2a7c3"/><ellipse cx="100" cy="92" rx="48" ry="44" fill="#dda55f" stroke="#9c6a30" stroke-width="3"/><path d="M100 48 a44 44 0 0 1 0 88 Z" fill="#dda55f" opacity=".55"/><path d="M62 66 L70 62 M138 66 L130 62 M56 92 L48 88 M144 92 L152 88" stroke="#9c6a30" stroke-width="2.5"/><ellipse cx="80" cy="90" rx="7" ry="9" fill="#20303c"/><ellipse cx="120" cy="90" rx="7" ry="9" fill="#20303c" opacity=".45"/><path d="M94 108 L106 108 L100 114 Z" fill="#c4527c"/><path d="M100 114 L100 120 M100 120 Q90 128 82 122 M100 120 Q110 128 118 122" stroke="#20303c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 150 L160 150 L152 190 L48 190 Z" fill="#b08954" stroke="#7d5f30" stroke-width="3"/><path d="M40 150 L14 138 M160 150 L186 138" stroke="#7d5f30" stroke-width="8" stroke-linecap="round"/><text x="100" y="176" text-anchor="middle" font-family="monospace" font-size="11" fill="#5d4517">DO NOT OBSERVE</text></svg>',
+      timetraveler: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Time traveller with a clock halo"><circle cx="100" cy="92" r="58" fill="none" stroke="#8b7fd4" stroke-width="3" stroke-dasharray="5 7"/><g stroke="#8b7fd4" stroke-width="4" stroke-linecap="round"><path d="M100 30 L100 40 M100 144 L100 154 M38 92 L48 92 M152 92 L162 92"/></g><path d="M100 92 L100 58 M100 92 L126 104" stroke="#5f54a8" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="94" r="40" fill="#eec39e" stroke="#bd8f5f" stroke-width="3"/><path d="M60 82 Q62 54 100 52 Q138 54 140 82 Q128 62 100 62 Q72 62 60 82" fill="#5f54a8"/><path d="M76 92 a7 7 0 1 1 7 7 a5 5 0 1 0 5 -5 M124 92 a7 7 0 1 0 -7 7 a5 5 0 1 1 -5 -5" stroke="#20303c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M86 120 Q100 114 114 121" stroke="#20303c" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M70 140 Q100 128 130 140 L136 176 L64 176 Z" fill="#3d3d6e"/><path d="M88 138 L100 158 L112 138" fill="#e8bc4a"/></svg>',
+      vendorrep: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Chadwick Slick, a very slick vendor rep"><path d="M100 30 Q146 30 146 84 Q146 118 118 128 L120 142 L80 142 L82 128 Q54 118 54 84 Q54 30 100 30 Z" fill="#7fae7a" stroke="#557f4f" stroke-width="3"/><path d="M64 52 Q100 34 136 52" stroke="#a9d1a1" stroke-width="6" fill="none" stroke-linecap="round" opacity=".8"/><path d="M96 30 Q92 12 78 10 M104 30 Q110 12 124 10" stroke="#557f4f" stroke-width="4" fill="none"/><circle cx="78" cy="10" r="5" fill="#ffb84a"/><circle cx="124" cy="10" r="5" fill="#ffb84a"/><ellipse cx="82" cy="80" rx="6" ry="8" fill="#141c2e"/><ellipse cx="118" cy="80" rx="6" ry="8" fill="#141c2e"/><path d="M74 102 Q100 118 126 100" stroke="#141c2e" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M58 190 L70 142 L130 142 L142 190 Z" fill="#2e3440" stroke="#1b1f27" stroke-width="2"/><path d="M92 142 L100 156 L108 142 L104 190 L96 190 Z" fill="#bf2f27"/><rect x="146" y="150" width="40" height="30" rx="4" fill="#8a5a2e" stroke="#5d3c1a" stroke-width="2"/><path d="M158 150 L158 142 Q166 134 174 142 L174 150" fill="none" stroke="#5d3c1a" stroke-width="3"/><rect x="152" y="162" width="28" height="5" fill="#e8bc4a"/></svg>',
+      verdantian2: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Bramble, a Verdantian with blue petals and thorns"><path d="M100 108 L100 182" stroke="#4d7c43" stroke-width="10" stroke-linecap="round"/><path d="M100 150 L92 138 M100 164 L110 152" stroke="#3c6134" stroke-width="5" stroke-linecap="round"/><path d="M100 150 Q66 140 58 112 Q92 116 100 150 M100 160 Q136 152 142 122 Q108 128 100 160" fill="#5d8a4a"/><g fill="#7f9fe0" stroke="#5273b8" stroke-width="2"><ellipse cx="100" cy="46" rx="11" ry="24"/><ellipse cx="66" cy="64" rx="11" ry="24" transform="rotate(-52 66 64)"/><ellipse cx="134" cy="64" rx="11" ry="24" transform="rotate(52 134 64)"/><ellipse cx="74" cy="96" rx="10" ry="20" transform="rotate(-96 74 96)"/><ellipse cx="126" cy="96" rx="10" ry="20" transform="rotate(96 126 96)"/></g><circle cx="100" cy="76" r="21" fill="#f6c445" stroke="#d9a83f" stroke-width="2"/><circle cx="93" cy="74" r="3.4" fill="#20303c"/><circle cx="107" cy="74" r="3.4" fill="#20303c"/><path d="M93 88 Q100 84 107 88" stroke="#20303c" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
+      inspector: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Inspector Okafor of the ICD, badge and cap"><circle cx="100" cy="92" r="44" fill="#8a5a3b" stroke="#5f3d24" stroke-width="3"/><path d="M56 78 Q54 44 100 44 Q146 44 144 78 L132 74 Q128 56 100 56 Q72 56 68 74 Z" fill="#141c2e"/><path d="M48 66 Q100 44 152 66 L154 76 Q100 62 46 76 Z" fill="#20303c"/><circle cx="100" cy="56" r="6" fill="#e8bc4a" stroke="#b8860b" stroke-width="1.5"/><circle cx="83" cy="92" r="5" fill="#141c2e"/><circle cx="117" cy="92" r="5" fill="#141c2e"/><path d="M84 80 L94 84 M116 80 L106 84" stroke="#141c2e" stroke-width="3" stroke-linecap="round"/><path d="M88 118 Q100 124 112 117" stroke="#141c2e" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M58 190 L64 144 Q100 130 136 144 L142 190 Z" fill="#20303c"/><rect x="118" y="152" width="16" height="20" rx="2" fill="#e8bc4a" stroke="#b8860b" stroke-width="1.5"/><path d="M100 140 L100 190" stroke="#141c2e" stroke-width="3"/><rect x="150" y="140" width="26" height="36" rx="2" fill="#fdfdf4" stroke="#b9cfc0" stroke-width="2"/><path d="M156 150 L170 150 M156 158 L170 158 M156 166 L166 166" stroke="#9db8a6" stroke-width="2.5"/></svg>'
     };
 
     var CUSTOMERS = [
@@ -665,6 +635,335 @@
       "Last customer of Day 1. Something feels... official about this one. Stay sharp."
     ];
 
+    /* ==================== DAY 2 DATA ==================== */
+    var PRODUCTS2 = {};
+    for (var pk in PRODUCTS) PRODUCTS2[pk] = PRODUCTS[pk];
+    PRODUCTS2.quasar = { name: "Quasar Concentrate", meta: "78% THC · the new highest number on the shelf · terp profile: 'yes'", price: 45, tag: "hot", tagText: "78% THC" };
+    PRODUCTS2.schrodinger = { name: "Schrödinger's Haze", meta: "Indica AND Sativa until observed · COA claims 140% THC · do not sell the box", price: 22, tag: "hot", tagText: "RECALLED", recalled: true };
+    var SHELF2 = ["blackhole", "moonrocks", "sativa", "dusty", "pulsar", "gummies", "bar", "mints", "cbdoil", "tincture", "quasar", "schrodinger"];
+    var RECALL_BODY = "You sold Schrödinger's Haze — RECALLED stock, Notice #4417, from a COA that reads 140% THC, which is not how percentages or physics work. The ICD pulls the whole batch off the shelf and staples your citation to the box. The box is now both evidence and not evidence.";
+
+    var CUSTOMERS2 = [
+      {
+        name: "Kyle", species: "Human", portrait: "human",
+        sub: "Day 1 survivor · the 31% was 'mid' · he has notes",
+        speech: "\"Bro. BRO. That dusty 31% pre-roll from yesterday? MID. Absolutely mid. I want a refund, an exchange, AND whatever the NEW highest number is — I heard a concentrate hit the shelf. And don't give me the terp talk again. ...Okay. Maybe give me the terp talk. But louder this time.\"",
+        wants: "Wants: a refund (there are no refunds on consumed product — Federation Rule 12) and the highest THC on the shelf. Yesterday's 25% physician cap is still in his Registry.",
+        docs: {
+          id: [["Name", "KYLE BRADDOCK"], ["Species", "Human"], ["Age", "34 yrs (emotionally 12)"], ["ID photo", "Matches. The backwards cap has been joined by sunglasses. Also laminated."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Day 1 purchase", "Dust Comet Pre-Roll — CONSUMED"], ["Refunds", "None. Rule 12."]] },
+          registry: [["Tolerance", "LOW — legend status remains aspirational"], ["Flags", "<span class='flag'>PHYSICIAN CAP: max 25% THC — still in force.</span> And no, a refund demand is not a loophole."]]
+        },
+        best: "sativa", ok: ["pulsar", "blackhole"], tip: 12,
+        perfectBody: "You hold the line with a smile: no refunds on consumed product — Federation Rule 12, not store policy, not Deb's personality. But a FRESH sale is legal, and the Sun-Kissed Sativa is 24% — under his cap — with a terp profile next to which the 31% dust stick tastes like a parking lot. Kyle goes quiet. Kyle gets it now. Kyle is a terp guy. He will be insufferable about this forever.",
+        bad: {
+          moonrocks: "51% THC to a customer with a 25% physician cap. Kyle achieved orbit, filed a complaint from orbit, and the ICD read both. Citation.",
+          dusty: "You sold Kyle the exact 31% pre-roll he came in furious about — and it's over his 25% cap anyway. He is composing the review in the parking lot. Citation.",
+          quasar: "78% concentrate to a man capped at 25%. Kyle briefly became a radio station and picked up traffic reports from three systems. Citation.",
+          bar: "100 mg to a low-tolerance human, again, after yesterday's file note. The ICD is starting to see a pattern. Citation.",
+          tincture: "The tincture is medical-only and Kyle holds a recreational permit. Handing it over because he was loud is not a legal doctrine. Citation."
+        },
+        reviewGood: "\"No refund. No exchange. Just... the terps, bro. THE TERPS. I've seen the other side and it's a terp profile. 5 stars.\"", reviewOk: "\"Not the highest number AGAIN, but fine. FINE. Whatever. 4 stars.\"", reviewDeny: "\"Denied AND no refund?! I'm telling my cousin. The budtender one. From Colorado Prime. 1 star.\""
+      },
+      {
+        name: "THE COLLECTIVE (Gary)", species: "Hive Mind", portrait: "hivemind",
+        sub: "47 drones · 1 trench coat · the coat is load-bearing",
+        speech: "\"WE ARE FORTY-SEVEN CITIZENS IN ONE MAGNIFICENT COAT. WE REQUIRE FORTY-SEVEN DAILY LIMITS OF GUMMIES. DO NOT LOOK AT THE COAT. THE COAT IS A BODY. THE BODY IS HUNGRY.\"",
+        wants: "Wants: 47 daily limits of gummies. New Day 2 rule: the daily limit is PER BODY. Count the bodies, not the voices.",
+        docs: {
+          id: [["Name", "THE COLLECTIVE (spokesperson: GARY)"], ["Species", "Hive Mind — 47 drones"], ["Age", "47 yrs collectively · 1 yr each"], ["ID photo", "47 faces. One coat. All of them blink at different times."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "1 — see Registry"]] },
+          registry: [["Bodies present", "1 (the coat is one vessel, legally)"], ["Tolerance", "One shared stomach. One shared liver. Doses are per body too."], ["Flags", "<span class='flag'>DAY 2 RULE: daily limit is PER BODY.</span> 47 minds, 1 body, 1 limit. The Federation has ruled. The coat has appealed. The appeal is pending forever."]]
+        },
+        best: "gummies", ok: ["mints"], tip: 14,
+        perfectBody: "You sell them ONE pack of Zero-G Gummies — one body, one daily limit, Federation ruling, coat or no coat. Forty-seven voices grumble in perfect unison, then Gary, the spokesperson drone, nods solemnly: 'THE COLLECTIVE ACCEPTS. THE COLLECTIVE ALSO TIPS. THE COLLECTIVE IS MANY, BUT IT IS FAIR.'",
+        denyOk: "You stamp DENIED on the 47-limit demand and hold up one finger: one body, one limit — they are welcome back as 47 separate visits in 47 separate coats. The Collective confers in a buzzing huddle for six full minutes, then accepts the ruling with outrageous dignity. Deb mouths 'thank you' through the office window.",
+        bad: {},
+        reviewGood: "\"ONE LIMIT. FORTY-SEVEN OPINIONS ABOUT IT. ALL OF THEM FAIR. 5 STARS.\"", reviewOk: "\"MINTS. THE COLLECTIVE IS UNDERWHELMED. IN CHORUS.\"", reviewDeny: "",
+        reviewDenyRight: "\"DENIED OUR EXCESS. RESPECTED OUR PERSONHOOD (SINGULAR). 5 STARS.\""
+      },
+      {
+        name: "Solana", species: "Venusian", portrait: "venusian",
+        sub: "First Venusian customer in station history · tourist · actively photosynthesizing",
+        speech: "\"Greetings! Venus legalized YESTERDAY and I took the first shuttle. I photosynthesize, so the sunlight in here is already... a lot. Something bright and creative for the garden tour? And maybe a small edible for later? I am told I am 'a lightweight with leaves.'\"",
+        wants: "Wants: bright, creative flower, maybe a gentle edible. BRAND-NEW SPECIES: the updated Handbook page on Venusians is the whole ballgame.",
+        docs: {
+          id: [["Name", "SOLANA VERDE"], ["Species", "Venusian"], ["Age", "61 yrs"], ["ID photo", "Matches. She is glowing faintly in it. She is glowing faintly now."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID — first Venusian permit on file"], ["Permit serial", "#0000001"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "PHOTOSYNTHETIC — edible doses hit at <span class='flag'>DOUBLE</span> strength (sunlight metabolism)"], ["Flags", "<span class='flag'>SEVERE MYRCENE ALLERGY.</span> <span class='flag'>Max labeled edible dose 5 mg</span> (= 10 mg effective). Limonene is fine. Myrcene is an emergency."]]
+        },
+        best: "sativa", ok: ["gummies", "mints"], tip: 15,
+        bad: {
+          blackhole: "Black Hole Kush is myrcene-heavy, and myrcene is a SEVERE allergen for Venusians — it's in the brand-new Registry entry in a font size Deb describes as 'screaming.' Solana's leaves curled before the citation finished printing.",
+          pulsar: "Pulsar Haze contains myrcene — zero limonene, sure, but that's the Day 1 allergy, not this one. Solana broke out in photosynthetic hives. Citation.",
+          bar: "A 100 mg bar for a photosynthesizer = 200 mg effective, against a 5 mg labeled cap. Solana didn't get high, she became a light source with opinions. Citation.",
+          tincture: "The tincture is medical-only and Solana holds the first recreational permit Venus ever issued. Historic sale! Also an illegal one. Citation."
+        },
+        reviewGood: "\"The citrus flower! The gardens SANG. My leaves are still applauding. 5 stars.\"", reviewOk: "\"A gentle edible, doubled by my own sunlight. Manageable. Pleasant. My petals say 4 stars.\"", reviewDeny: "\"The first Venusian EVER and she was denied? My government will hear of this. After my nap. In the sun. 1 star.\""
+      },
+      {
+        name: "Dale", species: "Human", portrait: "cowboy",
+        sub: "Neo-Texas tourist · whispering · sweating through his hat",
+        speech: "\"Psst. Hey. HEY. Listen — I need you to sell me a whole bunch of that Moon Rocks stuff. No receipt, no computer, and double-bag it — triple-bag it — 'cause I'm driving it home to Neo-Texas, and it is, uh... it is VERY illegal there. Like, prison illegal. You get me?\"",
+        wants: "Wants: Moon Rocks, off the books, to smuggle home to Neo-Texas — where possession is a felony. His permit is valid. His plan is the problem.",
+        docs: {
+          id: [["Name", "DALE HENSLEY"], ["Species", "Human"], ["Age", "41 yrs"], ["ID photo", "Matches. He is whispering in the photo too."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID — on this station"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "Destination of record: <span class='flag'>NEO-TEXAS — cannabis possession is a felony there.</span> Knowingly selling for transport across a prohibition border = distribution. Also he asked for 'no computer.' There is always a computer."]]
+        },
+        deny: { reason: "Dale's permit is valid — for THIS station. He is explicitly asking you to sell off-the-books product for him to smuggle into a prohibition jurisdiction, which makes you a distributor in a felony, not a budtender making a sale. You decline, keep your voice kind and your own volume at his, and he leaves with a Greenery Room hat he bought at full price, in the system, like a tourist. Deb frames the hat receipt.", serveViolation: "You sold contraband-to-be to a man who told you — in a whisper audible three aisles away — that he was driving it into a felony jurisdiction, and you skipped the S2S entry because he asked nicely. The ICD calls that distribution. Citation." },
+        reviewGood: "", reviewOk: "", reviewDeny: "",
+        reviewDenyRight: "\"Denied, but quiet and kind about it, and didn't make a scene. Bought a hat. My wife loves the hat. 5 stars.\""
+      },
+      {
+        name: "Vex Mirrorvale", species: "Vexian", portrait: "vexian",
+        sub: "Shapeshifter · completely different face than yesterday · that's fine",
+        speech: "\"Hello again — different face, same me, you know how it is. Pulsar Haze, please. Everything's in order: ID, permit, all names present and correct. Mostly. Names are just... sounds we agree on, really.\"",
+        wants: "Wants: Pulsar Haze. His face does not match his photo (legal for Vexians — Day 1). Compare the NAME on the ID to the NAME on the permit. Letter. For. Letter.",
+        docs: {
+          id: [["Name", "VEX MIRRORVALE"], ["Species", "Vexian"], ["Age", "52 yrs"], ["ID photo", "Does not match his current face. Legal and normal for Vexians. Not the issue."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Permit holder", "<span class='flag'>VEX MIRRORVALF</span>"], ["Status", "VALID (for whoever that is)"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "<span class='fine'>Vexian faces never match their photo — legal.</span> But ID name and permit name must match <span class='flag'>EXACTLY</span>. MIRRORVALE ≠ MIRRORVALF."]]
+        },
+        deny: { reason: "The face is a red herring — Vexian faces never match, that's Day 1 law. The NAME is the problem: the ID says MIRRORVALE, the permit says MIRRORVALF. One letter off is a different legal person, and selling on mismatched documents is exactly how budtenders end up in ICD training videos. He sighs, shifts his spare face into a disappointed sigh too, and leaves to fix his paperwork.", serveViolation: "You sold to MIRRORVALF on MIRRORVALE's ID — a one-letter name mismatch, the textbook document discrepancy the Federation warns about. The ICD flagged the sale before the exit bag sealed. The face was never the problem. The spelling was. Citation." },
+        reviewGood: "", reviewOk: "", reviewDeny: "",
+        reviewDenyRight: "\"Denied over ONE LETTER. He's right. I checked. It IS off. Fixing it tomorrow. 5 stars for the eyes.\""
+      },
+      {
+        name: "Pauli", species: "Quantum Felinoid", portrait: "catperson",
+        sub: "Cat-person · in a box, emotionally · wants the recalled one",
+        speech: "\"One bag of Schrödinger's Haze, please. Yes, I heard about the recall. The recall is a RUMOR until I observe it. My documents are perfect, my anxiety is quantum, and I am both a good boy and not a good boy until the bag opens.\"",
+        wants: "Wants: Schrödinger's Haze — RECALLED this morning (Notice #4417, COA reads 140% THC). His paperwork is flawless. It does not matter.",
+        docs: {
+          id: [["Name", "PAULI WHISKERTON"], ["Species", "Quantum Felinoid"], ["Age", "9 lives (6 remaining)"], ["ID photo", "Simultaneously matches and does not match. Physicists are involved."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "<span class='flag'>RECALL NOTICE #4417:</span> Schrödinger's Haze is recalled station-wide. COA reads 140% THC. It must not be sold to ANYONE — documents or no documents."]]
+        },
+        deny: { reason: "Perfect papers, recalled product — and the recall wins. A COA that reads 140% THC is either a lie, a misprint, or a war crime, and in all three cases the Haze stays in the back, in the box, unobserved, where it is simultaneously legal, illegal, and entirely unsellable. Pauli respects this. Pauli understands boxes.", serveViolation: "You sold RECALLED Schrödinger's Haze — Notice #4417, COA 140% THC — to a customer whose flawless documents did not matter even slightly. The bag is now both opened and unopened at an ICD evidence facility. Citation." },
+        reviewGood: "", reviewOk: "", reviewDeny: "",
+        reviewDenyRight: "\"Denied the recalled haze. I observed the refusal and collapsed into acceptance. 5 stars.\""
+      },
+      {
+        name: "Echo", species: "Human (temporal)", portrait: "timetraveler",
+        sub: "From next Thursday · has already been here · will be back yesterday",
+        speech: "\"Okay, don't freak out: I already took the edible. Tomorrow. It did NOTHING — I was there, I remember being there, completely sober, deeply betrayed. So today I need DOUBLE. Two bars. Or one bar twice. Time is a flat dosage chart.\"",
+        wants: "Wants: double his dose because tomorrow's edible 'didn't work.' The dose cap applies in every timeline.",
+        docs: {
+          id: [["Name", "ECHO TEMPORAL"], ["Species", "Human (temporally displaced)"], ["Age", "31 (and 31, and 31…)"], ["ID photo", "Matches, but younger. And older. The photo office has given up."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID (issued next week)"], ["Daily limit", "See Registry — it's complicated"]] },
+          registry: [["Tolerance", "Claims total immunity (unverified in all timelines)"], ["Flags", "Already consumed one (1) edible dose — <span class='flag'>TOMORROW</span>. The Federation counts it. <span class='flag'>TODAY'S CAP STILL APPLIES: max 10 mg per body per day, across all Thursdays.</span>"]]
+        },
+        best: "mints", ok: ["gummies"], tip: 13,
+        perfectBody: "You sell him one pack of Microdose Mints — one legal dose, today, in this timeline — and gently suggest he tell tomorrow-him to wait the full two hours before declaring an edible 'broken,' like every customer in recorded history. Echo goes very still. 'Oh. OH. That's what I came back to learn.' He leaves before he arrives.",
+        bad: {
+          bar: "You sold a 100 mg bar to a man who already ate tomorrow's dose and demanded double. In four timelines the station needed a new ceiling; in this one you just need a citation.",
+          tincture: "The tincture is medical-only, Echo holds a recreational permit, and 'time traveller' is not a qualifying condition in any century. Citation."
+        },
+        reviewGood: "\"The mints worked. They worked TOMORROW too, apparently — I remember now. Time is a flat 5 stars.\"", reviewOk: "\"Acceptable dose. See you yesterday.\"", reviewDeny: "\"Denied in THIS timeline?! I'll remember this tomorrow. And yesterday. 1 star, retroactively.\""
+      },
+      {
+        name: "Chadwick Slick", species: "Vendor Rep (Slith)", portrait: "vendorrep",
+        sub: "Regional sales · firm handshake · samples with NO manifest",
+        speech: "\"Chadwick Slick, Slick Farms Distribution. Love the store, love the energy. Listen — I've got a case of our new Moon Dust pre-rolls in the speeder. No manifest yet, paperwork's 'in the mail' — just take the samples, put 'em on the shelf, we'll true it up later. Happens all the time.\" (It does not happen all the time.)",
+        wants: "Wants: you to accept unmanifested product with no S2S transfer paperwork. He is NOT a customer. There is no sale here. There is only a trap with a handshake.",
+        docs: {
+          id: [["Name", "CHADWICK 'CHAD' SLICK"], ["Species", "Slith (sales morph)"], ["Credential", "Vendor ID — <span class='flag'>NOT a purchasing credential</span>"], ["ID photo", "Matches. The grin is trademarked."]],
+          permit: { type: "None", cls: "exp", rows: [["Status", "NO PERMIT — HE IS SELLING, ALLEGEDLY"], ["Daily limit", "n/a"]] },
+          registry: [["Registry entry", "None. He is not a patient or a customer."], ["Flags", "<span class='flag'>S2S RULE: all product enters inventory via a finalized transfer manifest, with COAs.</span> 'Samples' without a manifest = untested, untracked contraband."]]
+        },
+        deny: { reason: "No manifest, no COAs, no S2S transfer — no deal. Product without paperwork isn't inventory, it's contraband with a logo, and the moment it touches your shelf it becomes YOUR violation, not his. Chadwick respects the hustle, leaves his card (it just says 'CHAD'), and Deb adds Slick Farms to The List. The List is real. It's laminated.", serveViolation: "You took the samples. Unmanifested, untested, no COA, no S2S transfer — every gram became your citation the second it touched the shelf. Chadwick was gone before the bag opened. His speeder doesn't even have plates. Citation." },
+        reviewGood: "", reviewOk: "", reviewDeny: "",
+        reviewDenyRight: "\"Refused my samples AND quoted the manifest rule at me. Annoyingly legit store. 5 stars. — Chad\""
+      },
+      {
+        name: "Bramble", species: "Verdantian (Thornborn)", portrait: "verdantian2",
+        sub: "Blossom's cousin · the family's had a year · handle with care",
+        speech: "\"Hi… you helped my cousin Blossom last shift. The anniversary went great, by the way. This is… harder. Our grandmother's memorial grove is tonight, and for our family, bringing bright flower is how you say the things you can't say. Something beautiful? And please — everyone always makes it weird.\"",
+        wants: "Wants: bright flower for a family memorial. Legal, valid, and tender. The Day 1 rule still applies: don't make it weird.",
+        docs: {
+          id: [["Name", "BRAMBLE OF THE NORTH BED"], ["Species", "Verdantian · Thornborn"], ["Age", "71 yrs"], ["ID photo", "Matches. Taken last autumn. He has thorned since, but it's him."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["Daily limit", "Not reached"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "<span class='fine'>Flower = normal, meaningful commerce for Verdantians — anniversaries AND memorials.</span> <span class='flag'>No edibles</span> — Verdantians have no stomach."]]
+        },
+        best: "sativa", ok: ["pulsar", "blackhole"], tip: 16,
+        perfectBody: "You check his documents exactly like he's any other customer — because he is one — and hand over the Sun-Kissed Sativa without a single weird beat. Bramble exhales like he's been holding that breath since the parking lot. 'Blossom said you were like this.' Outside, the memorial grove lights are coming on.",
+        bad: {
+          gummies: "Edibles for a Verdantian — he has NO STOMACH, same as his cousin. The memorial became a medical incident. Citation.",
+          bar: "A 100 mg bar for a plant with no digestive system, on the day of his grandmother's memorial. Citation, and a family that will remember this.",
+          mints: "Mints are edibles, and Bramble has no stomach. Small mint, big emergency, one citation."
+        },
+        reviewGood: "\"He just sold me flower like it was normal. It WAS normal. That's the whole review. 5 stars.\"", reviewOk: "\"Not the brightest bunch, but grandma would've liked the effort.\"", reviewDeny: "\"A year this family's had, and the budtender made it weird anyway. 1 star.\""
+      },
+      {
+        name: "Inspector A. Okafor", species: "Human", portrait: "inspector",
+        sub: "ICD · badge out · clipboard out · this is the real one",
+        speech: "\"Good morning. Inspector Adaeze Okafor, Intergalactic Compliance Division — announced inspection. My documents are in order; verify them as long as you like. I will purchase one Pulsar Haze, for evidence calibration. Proceed exactly as you would for anyone. I will be writing throughout.\"",
+        wants: "Wants: Pulsar Haze, by the book. Everything matches. Everything is verifiable. Shortcuts are what she's here to catch.",
+        docs: {
+          id: [["Name", "ADAEZE OKAFOR"], ["Species", "Human"], ["Age", "47 yrs"], ["ID photo", "Matches. Exactly. Almost suspiciously — no. It just matches."]],
+          permit: { type: "Recreational", cls: "rec", rows: [["Status", "VALID"], ["ID number", "Verified ✓ matches Registry"]] },
+          registry: [["Tolerance", "Standard"], ["Flags", "<span class='fine'>ANNOUNCED ICD INSPECTION.</span> Serve exactly by the book: the correct product, the correct process. Correct service earns a compliance bonus."]]
+        },
+        best: "pulsar", ok: [], tip: 0, bonus: 25, strict: true,
+        strictText: "Inspector Okafor looks at the product, then at her clipboard, then at you. 'Wrong item. The request was specific, the shelf is labeled, and the process exists precisely so this does not happen.' She does not raise her voice. The clipboard does it for her. Citation.",
+        denyCitation: "You denied an announced ICD inspector with flawless documents on a lawful, specific request. Her report uses the phrase 'arbitrary refusal of lawful sale' and attaches the security footage. Citation.",
+        denyCiteQuote: "\"Inspector's log: lawful sale refused without cause. The process exists. Follow it.\" — ICD",
+        perfectBody: "Documents verified. Correct product. S2S entry clean, label compliant, exit bag defeated on her behalf with professional courtesy. Inspector Okafor signs the inspection sheet, and — in what Deb later describes as 'basically a hug, from the ICD' — issues the store a compliance commendation with a 25₡ bonus attached.",
+        bad: {},
+        reviewGood: "\"Inspector's final note: documents verified, correct product, process followed to the letter. This is the standard. 5 stars.\"", reviewOk: "", reviewDeny: ""
+      }
+    ];
+
+    var MGR_LINES2 = [
+      "Kyle's back. KYLE IS BACK. Deep breath. No refunds on consumed product — Federation Rule 12. Not store policy. Not my personality.",
+      "The trench coat by the door is 47 people and one daily limit. PER BODY. The Federation ruled. Do not let the coat argue.",
+      "First Venusian EVER today. Read the new handbook page — photosynthesis is not a metaphor, it's a dosing rule.",
+      "If a tourist starts whispering, the answer is still no — just say it at his volume.",
+      "Shapeshifter again. Faces lie, and that's legal. SPELLING doesn't get to lie. Match the names letter for letter.",
+      "Schrödinger's Haze is recalled. If it's requested, it's denied. The COA says 140%. Percent. Of a hundred.",
+      "A man from next Thursday is coming in about an edible he already ate. I don't get paid enough for tenses — just follow the dose cap.",
+      "Vendor rep today. If Chadwick offers samples with no manifest: paperwork first, product never. THE LIST is laminated for a reason.",
+      "That's Blossom's cousin. The family's had a year. Be a professional, be kind, don't make it weird.",
+      "Final customer is an actual ICD inspector — announced, badged, clipboarded. By the book, every step. You've got this."
+    ];
+
+    /* ==================== BRIEFINGS & HANDBOOKS ==================== */
+    var HOW_BOX = '<h3>HOW A SHIFT WORKS</h3><ul class="tight">' +
+      '<li><b>Read the request.</b> Customers describe their problems terribly. That\'s the job.</li>' +
+      '<li><b>Check the documents.</b> Galactic ID, permit, and the Species Tolerance Registry. Something is usually off.</li>' +
+      '<li><b>Pick a product</b> from the shelf that matches their need, their species, and the law — or don\'t sell at all.</li>' +
+      '<li><b>Stamp it.</b> APPROVED sells your selected product. DENIED sends them away. Both can be right. Both can end your career.</li></ul>';
+    var SCORE_BOX = '<h3>SCORING</h3><ul class="tight">' +
+      '<li>Perfect match: sale + tip. Wrong-but-legal product: sale, no tip, side-eye.</li>' +
+      '<li>Correct denial: +15₡ compliance bonus. Wrongful denial: a 1-star review with your name in it.</li>' +
+      '<li>Illegal sale: citation. Yes, even if they were really nice about it.</li></ul>';
+
+    var BRIEF1 = {
+      over: "The Greenery Room · Orbital Station 7 · Now Hiring (Desperate)",
+      lede: "You are the only human budtender on the station — hired because humans are the one species that doesn't explode, molt, achieve telepathy, or enter a 40-year hibernation from a 10&nbsp;mg gummy. Ten customers. One counter. A stamp with your name on it.",
+      startLabel: "CLOCK IN — START DAY 1",
+      boxes: [
+        HOW_BOX,
+        '<h3>DAY 1 RULES — THE SHORT VERSION</h3><ul class="tight">' +
+        '<li>Adult age is <b>different for every species</b>. A 5-year-old Klarg is a grown taxpayer. An 87-year-old Nebula Ent is a child.</li>' +
+        '<li><b>Medical-only products</b> need a valid, unexpired medical permit.</li>' +
+        '<li>The Registry flags hard limits — THC caps, edible dose caps, allergens. <b>Registry beats customer confidence.</b></li>' +
+        '<li><b>3 citations from the ICD</b> (Intergalactic Compliance Division) and you\'re fired. The stamp giveth, the stamp taketh away.</li></ul>',
+        SCORE_BOX,
+        '<h3>FROM YOUR MANAGER, DEB</h3><ul class="tight">' +
+        '<li>"Welcome aboard. The handbook button is right under Clock In — and there\'s another one on the counter all shift. Read it, it\'s the whole job."</li>' +
+        '<li>"Do NOT upsell the loyalty program to anyone who is actively molting."</li>' +
+        '<li>"If someone says \'my cousin\'s a budtender on Colorado Prime,\' that is not a medical permit."</li></ul>'
+      ]
+    };
+
+    var BRIEF2 = {
+      over: "Day 2 · Venus Legalized Overnight · It Gets Worse",
+      lede: "You survived Day 1. Overnight, Venus legalized recreational, the Federation recalled a product that violates arithmetic itself, and Kyle has had twelve hours to get madder. Ten more customers. New rules. The stamp missed you.",
+      startLabel: "CLOCK IN — START DAY 2",
+      boxes: [
+        HOW_BOX,
+        '<h3>DAY 2 — NEW FEDERATION RULES</h3><ul class="tight">' +
+        '<li><b>Venus just legalized recreational.</b> Venusians are a brand-new species in the Handbook: they <b>photosynthesize</b>, so edibles hit them at <b>DOUBLE</b> strength — and <b>myrcene is a severe allergen</b> for them.</li>' +
+        '<li><b>SCHRÖDINGER\'S HAZE IS RECALLED</b> (Notice #4417). Its COA reads 140% THC. If anyone asks for it, the answer is DENIED — and recalled stock must never be sold to anyone.</li>' +
+        '<li><b>Daily limits are now PER BODY.</b> One body, one limit — no matter how many citizens are stacked inside it.</li>' +
+        '<li>Everything from Day 1 still applies: species adult ages, medical-only permits, registry caps and allergens.</li></ul>',
+        SCORE_BOX,
+        '<h3>FROM YOUR MANAGER, DEB</h3><ul class="tight">' +
+        '<li>"Kyle is coming back. KYLE. IS. BACK. No refunds on consumed product — Federation Rule 12, not store policy, not my personality."</li>' +
+        '<li>"A vendor rep will try to hand you \'samples\' today. No manifest, no S2S transfer, no deal. Product without paperwork is contraband with a logo."</li>' +
+        '<li>"Faces lie on shapeshifters — that\'s legal. Names don\'t get to lie: ID name and permit name match letter-for-letter, or nobody leaves with anything."</li>' +
+        '<li>"The ICD is running a REAL inspection today. Yesterday\'s trench coat was the warm-up act."</li></ul>'
+      ]
+    };
+
+    function handbookHtml(extraRows, extraRules, recall) {
+      var rows =
+        '<tr><td><b>Human</b></td><td>21 yrs</td><td>Standard everything. Terrified of being seen buying weed by anyone from their home planet.</td></tr>' +
+        '<tr><td><b>Boulderian</b></td><td>20 cycles</td><td>Two tons of living rock. Enormous tolerance. Doses that would crater a village are a light snack.</td></tr>' +
+        '<tr><td><b>Nebula Ent</b></td><td>412 yrs</td><td>Treefolk. Look ancient at every age. An 87-year-old Ent is a minor no matter how wise the beard of moss looks.</td></tr>' +
+        '<tr><td><b>Klarg</b></td><td>3 yrs</td><td>900-gram sentient gel. Adults look exactly like babies of every other species. Max edible dose 10&nbsp;mg, max flower 25% THC — small body, full consequences.</td></tr>' +
+        '<tr><td><b>Tentaculan</b></td><td>18 yrs</td><td><b>Limonene is a severe allergen.</b> Citrus terps = citation + a very dramatic rash in 9 appendages.</td></tr>' +
+        '<tr><td><b>Moon Sprite</b></td><td>30 sprite-yrs</td><td>Weighs about 5&nbsp;kg with the wings. Max edible dose 10&nbsp;mg. A 100&nbsp;mg bar is not a dose, it\'s an orbital event.</td></tr>' +
+        '<tr><td><b>Verdantian</b></td><td>50 yrs</td><td>Sentient plants. Buying flower is normal, polite commerce (for Petalborn subspecies it\'s romantic). No stomach — edibles are a medical emergency, not a snack.</td></tr>' +
+        '<tr><td><b>Unit-series Robot</b></td><td>n/a</td><td>Not biological. CBD oil is a maintenance product — no permit needed. Selling them THC voids their warranty and counts as waste fraud.</td></tr>' +
+        '<tr><td><b>Vexian</b></td><td>25 yrs</td><td>Shapeshifters. Their ID photo <b>never</b> matches their current face. That is legal and normal. Judge the permit and ID number, never the face.</td></tr>' +
+        extraRows;
+      return '<p style="color:var(--ink-soft); margin-top:0;">Galactic Federation standard reference. Updated this morning, obviously, just to keep you on your toes. The Registry card on the counter always overrides this page for an individual customer.</p>' +
+        (recall || "") +
+        '<table class="rules-table"><thead><tr><th>Species</th><th>Adult at</th><th>Know this</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+        '<h3>Standing rules</h3><ul class="tight">' +
+        '<li><b>Medical-only</b> products (tagged on the shelf) require a medical permit that is <b>valid today</b>. "It expired yesterday" is expired.</li>' +
+        '<li>Registry flags — THC caps, dose caps, allergens — are hard law, not suggestions. The customer\'s confidence is not evidence.</li>' +
+        '<li>Recreational permit covers everything not tagged medical-only. No permit at all = no sale, full stop.</li>' +
+        extraRules +
+        '<li>Three ICD citations in a shift and you\'re fired on the spot. Deb will not cry. Deb never cries.</li></ul>';
+    }
+
+    var HANDBOOK1 = handbookHtml("", "");
+    var HANDBOOK2 = handbookHtml(
+      '<tr><td><b>Venusian</b> · NEW</td><td>40 yrs</td><td><b>Photosynthesize:</b> sunlit metabolism means edible doses hit at <b>DOUBLE</b> strength — max labeled edible dose 5&nbsp;mg. <b>Myrcene is a severe allergen.</b> Limonene is fine.</td></tr>' +
+      '<tr><td><b>Hive Mind</b> · NEW</td><td>Collective</td><td>Dozens of drones, one shared body, one shared stomach. Daily limit is <b>PER BODY</b>: one limit total, however many voices are asking.</td></tr>' +
+      '<tr><td><b>Quantum Felinoid</b> · NEW</td><td>2 yrs</td><td>Cat-people in a state of quantum uncertainty. Will ask for recalled products with a completely straight face. The recall still wins.</td></tr>' +
+      '<tr><td><b>Human (temporal)</b> · NEW</td><td>21 yrs (each)</td><td>Time travellers age in several directions. Dose caps apply per body per day <b>across all timelines</b> — a dose eaten tomorrow still counts.</td></tr>',
+      '<li><b>NEW — Daily limit is PER BODY.</b> One body, one limit, regardless of how many minds, drones, or timelines are stacked inside it.</li>' +
+      '<li><b>NEW — Document names must match EXACTLY.</b> A Vexian\'s face never matches (legal); a one-letter name difference between ID and permit is a different legal person (denial).</li>' +
+      '<li><b>NEW — No refunds on consumed product</b> (Federation Rule 12). Angry is not a loophole.</li>' +
+      '<li><b>NEW — Product enters inventory ONLY via a finalized S2S transfer manifest</b>, with COAs. Vendor "samples" without paperwork are contraband, and accepting them is YOUR citation.</li>',
+      '<div class="recall-box"><b>⚠ RECALL NOTICE #4417 — SCHRÖDINGER\'S HAZE.</b> COA reads 140% THC. Recalled station-wide as of this morning. It must not be sold to anyone, for any reason, with any documents. If it is requested, the answer is DENIED.</div>'
+    );
+
+    /* ==================== DAY CONFIG ==================== */
+    var DAYS = [
+      { products: PRODUCTS, shelf: SHELF, customers: CUSTOMERS, mgr: MGR_LINES, brief: BRIEF1, handbook: HANDBOOK1 },
+      { products: PRODUCTS2, shelf: SHELF2, customers: CUSTOMERS2, mgr: MGR_LINES2, brief: BRIEF2, handbook: HANDBOOK2 }
+    ];
+    var CURDAY = 0;
+
+    function applyDay(i) {
+      CURDAY = i;
+      PRODUCTS = DAYS[i].products; SHELF = DAYS[i].shelf;
+      CUSTOMERS = DAYS[i].customers; MGR_LINES = DAYS[i].mgr;
+      el("st-day").textContent = "Day " + (i + 1);
+      document.title = "Alien Dispensary — Day " + (i + 1);
+    }
+
+    function renderBrief() {
+      var b = DAYS[CURDAY].brief;
+      el("brief-over").textContent = b.over;
+      el("brief-lede").innerHTML = b.lede;
+      el("brief-boxes").innerHTML = b.boxes.map(function (x) { return '<div class="brief-box">' + x + "</div>"; }).join("");
+      el("btn-start").textContent = b.startLabel;
+      for (var i = 0; i < 2; i++) {
+        var t = el("tab-day-" + i);
+        var on = i === CURDAY;
+        t.classList.toggle("on", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      }
+    }
+
+    function gotoBrief(i) {
+      applyDay(i);
+      renderBrief();
+      hide("screen-game"); hide("screen-end"); show("screen-brief");
+      window.scrollTo({ top: 0 });
+    }
+
+    function endBlurb(fired) {
+      if (CURDAY === 0) {
+        if (fired) return { rank: "RANK: FORMER BUDTENDER", blurb: "Three citations. The ICD escorts you out past the exit bags. Deb leaves your name tag on the counter 'as a warning to the next one.' The stamp is reassigned. The stamp always survives." };
+        if (S.perfect >= 7 && S.citations === 0) return { rank: "RANK: BUDTENDER OF THE MONTH (PROVISIONAL, DAY 1)", blurb: "A near-flawless first shift. You read registries, respected allergens, dosed by body mass, and didn't flinch at a shapeshifter. Deb is drafting your commendation. It is one sentence long and it just says 'adequate.' From Deb, that's a love letter." };
+        if (S.citations === 0) return { rank: "RANK: SOLID SHIFT", blurb: "No citations, customers alive, reviews respectable. In this industry, that's a win you frame. Come back tomorrow — Day 2 is when Venus legalizes recreational and everything gets worse." };
+        if (S.citations === 1) return { rank: "RANK: SURVIVED, WITH PAPERWORK", blurb: "One citation to learn from. Every real budtender has a story that starts exactly like yours. Yours just happened to involve witnesses from a galactic regulatory body." };
+        return { rank: "RANK: ON THIN ICE (2 CITATIONS)", blurb: "Two citations in one shift. One more and the stamp gets taken away. Deb has already printed the 'we're hiring' sign, 'just in case.'" };
+      }
+      if (fired) return { rank: "RANK: FORMER BUDTENDER", blurb: "Three citations on Day 2. Inspector Okafor signs the termination herself — neatly, in triplicate, by the book. The Collective sends a card signed by all 47. The stamp is reassigned. The stamp always survives." };
+      if (S.perfect >= 6 && S.citations === 0) return { rank: "RANK: BUDTENDER OF THE MONTH (NO LONGER PROVISIONAL)", blurb: "A near-flawless second shift: a new species dosed by sunlight, a hive mind limited by coat, a recall honored, a manifest refused, and an actual inspector sent away happy. Deb upgrades your commendation to two sentences. One of them is 'adequate.' The other is classified." };
+      if (S.citations === 0) return { rank: "RANK: SOLID SHIFT", blurb: "No citations on the day Venus legalized, a product got recalled, and Kyle came back. Deb is quietly updating your file from 'warm body' to 'budtender.' Day 3, she warns, is when the POS system goes down across the galaxy." };
+      if (S.citations === 1) return { rank: "RANK: SURVIVED, WITH PAPERWORK", blurb: "One citation on a day designed by the Federation specifically to generate them. Deb files it under 'tuition.' Every budtender pays it once. The good ones only once." };
+      return { rank: "RANK: ON THIN ICE (2 CITATIONS)", blurb: "Two citations, and Inspector Okafor now knows your handwriting. One more and the stamp is gone. Deb has moved the 'we're hiring' sign from the drawer to the desk. Progress." };
+    }
+
     /* ==================== STATE & AUDIO ==================== */
     var S = null;
     function freshState() {
@@ -799,6 +1098,22 @@
           stars = 5; quote = c.reviewDenyRight;
           out.kind = "correct-deny";
           S.served++;
+        } else if (c.denyOk) {
+          verdict = "CORRECT DENIAL"; vcls = "good";
+          title = "Denied the excess — exactly right";
+          body = c.denyOk;
+          S.credits += 15; delta = "+15₡ compliance bonus"; deltaCls = "plus";
+          stars = 5; quote = c.reviewDenyRight;
+          out.kind = "correct-deny";
+          S.served++;
+        } else if (c.denyCitation) {
+          verdict = "CITATION"; vcls = "bad";
+          title = "ICD Citation #" + (S.citations + 1);
+          body = c.denyCitation;
+          S.citations++; out.citation = true;
+          delta = "+0₡ — denial overturned by the ICD"; deltaCls = "minus";
+          stars = 1; quote = c.denyCiteQuote || "\"One star.\" — " + c.name;
+          out.kind = "citation";
         } else {
           verdict = "WRONGFUL DENIAL"; vcls = "bad";
           title = "Denied a legal sale";
@@ -826,13 +1141,33 @@
           delta = "+0₡ — sale voided by the ICD"; deltaCls = "minus";
           stars = 1; quote = c.reviewGood ? "\"One star. Would not survive again.\" — " + c.name : "\"One star.\" — " + c.name;
           out.kind = "citation";
+        } else if (p.recalled) {
+          verdict = "CITATION"; vcls = "bad";
+          title = "ICD Citation #" + (S.citations + 1);
+          body = RECALL_BODY;
+          S.citations++; out.citation = true;
+          delta = "+0₡ — recalled stock seized by the ICD"; deltaCls = "minus";
+          stars = 1; quote = "\"The budtender sold the recalled one. The box is evidence now.\" — ICD field report";
+          out.kind = "citation";
+        } else if (c.strict && pid !== c.best) {
+          verdict = "CITATION"; vcls = "bad";
+          title = "ICD Citation #" + (S.citations + 1);
+          body = c.strictText;
+          S.citations++; out.citation = true;
+          delta = "+0₡ — sale voided by the ICD"; deltaCls = "minus";
+          stars = 1; quote = "\"Inspector's log: incorrect product issued to an ICD officer during an announced inspection.\" — ICD";
+          out.kind = "citation";
         } else if (pid === c.best) {
           verdict = "PERFECT MATCH"; vcls = "good";
           title = p.name + " — exactly right";
-          body = "Right product, right species, right dose, all paperwork clean. You weigh it, scan it in Star-To-Star seed-to-sale, print a label long enough to have chapters, and defeat the child-resistant exit bag on the customer's behalf. This is the whole job, done perfectly.";
+          body = c.perfectBody || "Right product, right species, right dose, all paperwork clean. You weigh it, scan it in Star-To-Star seed-to-sale, print a label long enough to have chapters, and defeat the child-resistant exit bag on the customer's behalf. This is the whole job, done perfectly.";
           if (c.inspector) body += " He pauses at the door, peels off the trench coat to reveal an ICD inspector's badge, and salutes you with two of his seven fingers.";
-          S.credits += p.price + (c.tip || 0);
-          delta = "+" + (p.price + (c.tip || 0)) + "₡ (sale " + p.price + "₡ + tip " + (c.tip || 0) + "₡)"; deltaCls = "plus";
+          var gain = p.price + (c.tip || 0) + (c.bonus || 0);
+          var parts = ["sale " + p.price + "₡"];
+          if (c.tip) parts.push("tip " + c.tip + "₡");
+          if (c.bonus) parts.push("compliance bonus " + c.bonus + "₡");
+          S.credits += gain;
+          delta = "+" + gain + "₡ (" + parts.join(" + ") + ")"; deltaCls = "plus";
           stars = 5; quote = c.reviewGood;
           out.kind = "perfect"; S.perfect++; S.served++;
         } else if (c.ok && c.ok.indexOf(pid) >= 0) {
@@ -888,26 +1223,14 @@
       hide("screen-game"); show("screen-end");
       var fired = S.citations >= 3;
       var avg = S.stars.length ? (S.stars.reduce(function (a, b) { return a + b; }, 0) / S.stars.length) : 0;
-      el("end-title").textContent = fired ? "Fired on Day 1" : "Day 1 Complete";
-      var rank, blurb;
-      if (fired) {
-        rank = "RANK: FORMER BUDTENDER";
-        blurb = "Three citations. The ICD escorts you out past the exit bags. Deb leaves your name tag on the counter 'as a warning to the next one.' The stamp is reassigned. The stamp always survives.";
-      } else if (S.perfect >= 7 && S.citations === 0) {
-        rank = "RANK: BUDTENDER OF THE MONTH (PROVISIONAL, DAY 1)";
-        blurb = "A near-flawless first shift. You read registries, respected allergens, dosed by body mass, and didn't flinch at a shapeshifter. Deb is drafting your commendation. It is one sentence long and it just says 'adequate.' From Deb, that's a love letter.";
-      } else if (S.citations === 0) {
-        rank = "RANK: SOLID SHIFT";
-        blurb = "No citations, customers alive, reviews respectable. In this industry, that's a win you frame. Come back tomorrow — Day 2 is when Venus legalizes recreational and everything gets worse.";
-      } else if (S.citations === 1) {
-        rank = "RANK: SURVIVED, WITH PAPERWORK";
-        blurb = "One citation to learn from. Every real budtender has a story that starts exactly like yours. Yours just happened to involve witnesses from a galactic regulatory body.";
-      } else {
-        rank = "RANK: ON THIN ICE (2 CITATIONS)";
-        blurb = "Two citations in one shift. One more and the stamp gets taken away. Deb has already printed the 'we're hiring' sign, 'just in case.'";
-      }
-      el("end-rank").textContent = rank;
-      el("end-blurb").textContent = blurb;
+      el("end-title").textContent = fired ? "Fired on Day " + (CURDAY + 1) : "Day " + (CURDAY + 1) + " Complete";
+      var eb = endBlurb(fired);
+      el("end-rank").textContent = eb.rank;
+      el("end-blurb").textContent = eb.blurb;
+      el("btn-again").textContent = "WORK ANOTHER DAY " + (CURDAY + 1);
+      var nb = el("btn-nextday");
+      nb.dataset.target = CURDAY === 0 ? "1" : "0";
+      nb.textContent = CURDAY === 0 ? "CONTINUE TO DAY 2 →" : "← REPLAY DAY 1";
       el("end-credits").textContent = S.credits + "₡";
       el("end-served").textContent = S.served + " / " + CUSTOMERS.length;
       el("end-perfect").textContent = S.perfect;
@@ -933,10 +1256,19 @@
     /* ==================== WIRING ==================== */
     el("btn-start").addEventListener("click", function () { S = S || freshState(); startGame(); });
     el("btn-again").addEventListener("click", startGame);
+    el("btn-nextday").addEventListener("click", function () { gotoBrief(parseInt(this.dataset.target || "1", 10)); });
+    var tabs = document.querySelectorAll(".day-tab");
+    for (var ti = 0; ti < tabs.length; ti++) {
+      tabs[ti].addEventListener("click", function () { applyDay(parseInt(this.getAttribute("data-day"), 10)); renderBrief(); });
+    }
     el("btn-approve").addEventListener("click", function () { if (S.selected) resolve({ type: "serve", product: S.selected }); });
     el("btn-deny").addEventListener("click", function () { resolve({ type: "deny" }); });
     el("btn-next").addEventListener("click", next);
-    function openBook() { el("overlay-book").classList.add("open"); }
+    function openBook() {
+      el("book-title").textContent = "Species Handbook — Day " + (CURDAY + 1) + " Edition";
+      el("book-body").innerHTML = DAYS[CURDAY].handbook;
+      el("overlay-book").classList.add("open");
+    }
     function closeBook() { el("overlay-book").classList.remove("open"); }
     el("btn-book").addEventListener("click", openBook);
     el("btn-book-brief").addEventListener("click", openBook);
@@ -952,6 +1284,7 @@
       if (e.key === "Escape") closeBook();
     });
     S = freshState();
+    renderBrief();
     </script>
   </body>
 </html>
