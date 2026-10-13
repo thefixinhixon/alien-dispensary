@@ -27,3 +27,7 @@ https://thefixinhixon.github.io/alien-dispensary/
 Pure static single-file game (`index.html`) — no backend, no Firebase, no build step. All state lives in the browser and resets on reload. Sound effects are WebAudio (mutable in-game); light and dark modes included.
 
 *Prototype — Days 1–2. Feedback from real budtenders especially welcome.*
+
+## Character videos
+
+Day 1 customers (plus the Day 2 Hive Mind) have hand-drawn animated video portraits in `media/loops/` (VP9 WebM, muted loops) with poster stills in `media/posters/`. The game loads only the current customer's video; if a video file is missing it automatically falls back to the built-in SVG portrait, and `prefers-reduced-motion` shows the poster still instead.

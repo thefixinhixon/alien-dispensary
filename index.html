@@ -128,6 +128,12 @@
         padding: 16px 8px 6px; position: relative;
       }
       .portrait { width: 168px; height: 168px; margin: 0 auto; display: block; }
+      .portrait-wrap { position: relative; width: 168px; height: 168px; margin: 0 auto; }
+      .portrait-wrap .portrait { margin: 0; }
+      .portrait-video {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+        object-fit: cover; border-radius: 10px; display: block;
+      }
       .cust-name { font-family: "Chakra Petch", sans-serif; font-weight: 700; font-size: 1.25rem; margin-top: 8px; }
       .cust-sub { color: var(--ink-soft); font-size: .9rem; }
       .speech {
@@ -449,6 +455,82 @@
       verdantian2: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Bramble, a Verdantian with blue petals and thorns"><path d="M100 108 L100 182" stroke="#4d7c43" stroke-width="10" stroke-linecap="round"/><path d="M100 150 L92 138 M100 164 L110 152" stroke="#3c6134" stroke-width="5" stroke-linecap="round"/><path d="M100 150 Q66 140 58 112 Q92 116 100 150 M100 160 Q136 152 142 122 Q108 128 100 160" fill="#5d8a4a"/><g fill="#7f9fe0" stroke="#5273b8" stroke-width="2"><ellipse cx="100" cy="46" rx="11" ry="24"/><ellipse cx="66" cy="64" rx="11" ry="24" transform="rotate(-52 66 64)"/><ellipse cx="134" cy="64" rx="11" ry="24" transform="rotate(52 134 64)"/><ellipse cx="74" cy="96" rx="10" ry="20" transform="rotate(-96 74 96)"/><ellipse cx="126" cy="96" rx="10" ry="20" transform="rotate(96 126 96)"/></g><circle cx="100" cy="76" r="21" fill="#f6c445" stroke="#d9a83f" stroke-width="2"/><circle cx="93" cy="74" r="3.4" fill="#20303c"/><circle cx="107" cy="74" r="3.4" fill="#20303c"/><path d="M93 88 Q100 84 107 88" stroke="#20303c" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
       inspector: '<svg class="portrait" viewBox="0 0 200 200" role="img" aria-label="Inspector Okafor of the ICD, badge and cap"><circle cx="100" cy="92" r="44" fill="#8a5a3b" stroke="#5f3d24" stroke-width="3"/><path d="M56 78 Q54 44 100 44 Q146 44 144 78 L132 74 Q128 56 100 56 Q72 56 68 74 Z" fill="#141c2e"/><path d="M48 66 Q100 44 152 66 L154 76 Q100 62 46 76 Z" fill="#20303c"/><circle cx="100" cy="56" r="6" fill="#e8bc4a" stroke="#b8860b" stroke-width="1.5"/><circle cx="83" cy="92" r="5" fill="#141c2e"/><circle cx="117" cy="92" r="5" fill="#141c2e"/><path d="M84 80 L94 84 M116 80 L106 84" stroke="#141c2e" stroke-width="3" stroke-linecap="round"/><path d="M88 118 Q100 124 112 117" stroke="#141c2e" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M58 190 L64 144 Q100 130 136 144 L142 190 Z" fill="#20303c"/><rect x="118" y="152" width="16" height="20" rx="2" fill="#e8bc4a" stroke="#b8860b" stroke-width="1.5"/><path d="M100 140 L100 190" stroke="#141c2e" stroke-width="3"/><rect x="150" y="140" width="26" height="36" rx="2" fill="#fdfdf4" stroke="#b9cfc0" stroke-width="2"/><path d="M156 150 L170 150 M156 158 L170 158 M156 166 L166 166" stroke="#9db8a6" stroke-width="2.5"/></svg>'
     };
+
+    /* Animated portrait loops (external files, GitHub repo: media/loops + media/posters).
+       Keyed by day + exact customer name so lookalike customers (e.g. Day 2's Vex
+       Mirrorvale, Bramble, Inspector Okafor) keep their SVG portraits. */
+    var VIDEO_SLUGS = {
+      "0:Grob": "grob",
+      "0:Kyle": "kyle",
+      "0:Timble": "timble",
+      "0:Pib": "pib",
+      "0:Zorpulon": "tentaculan",
+      "0:Luma": "moon-sprite",
+      "0:Old Man Jenkins-Prime": "jenkins-prime",
+      "0:UNIT-7 'Rusty'": "rusty",
+      "0:Blossom": "blossom",
+      "0:A Completely Normal Customer": "inspector",
+      "1:Kyle": "kyle",
+      "1:THE COLLECTIVE (Gary)": "hive-mind"
+    };
+    function videoSlugFor(c) {
+      return VIDEO_SLUGS[CURDAY + ":" + c.name] || null;
+    }
+    function prefersReducedMotion() {
+      try { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+      catch (e) { return false; }
+    }
+    function stopPortraitMedia() {
+      var vids = document.querySelectorAll("#portrait-slot video");
+      for (var i = 0; i < vids.length; i++) {
+        try { vids[i].pause(); } catch (e) {}
+        try { vids[i].removeAttribute("src"); } catch (e) {}
+      }
+    }
+    function renderPortraitMedia(wrap, slug) {
+      var posterUrl = "media/posters/" + slug + ".jpg";
+      var videoUrl = "media/loops/" + slug + ".webm";
+      if (prefersReducedMotion()) {
+        var img = document.createElement("img");
+        img.className = "portrait-video";
+        img.src = posterUrl;
+        img.alt = "";
+        img.setAttribute("aria-hidden", "true");
+        img.setAttribute("data-video-slug", slug);
+        img.addEventListener("error", function () { img.style.display = "none"; });
+        wrap.appendChild(img);
+        return;
+      }
+      var vid = document.createElement("video");
+      vid.className = "portrait-video";
+      vid.muted = true;
+      vid.loop = true;
+      vid.autoplay = true;
+      vid.playsInline = true;
+      vid.preload = "auto";
+      vid.poster = posterUrl;
+      vid.setAttribute("muted", "");
+      vid.setAttribute("loop", "");
+      vid.setAttribute("autoplay", "");
+      vid.setAttribute("playsinline", "");
+      vid.setAttribute("aria-hidden", "true");
+      vid.setAttribute("data-video-slug", slug);
+      var hideVid = function () {
+        try { vid.pause(); } catch (e) {}
+        vid.style.display = "none";
+      };
+      vid.addEventListener("error", hideVid, true);
+      var src = document.createElement("source");
+      src.src = videoUrl;
+      src.type = "video/webm";
+      src.addEventListener("error", hideVid);
+      vid.appendChild(src);
+      wrap.appendChild(vid);
+      try {
+        var pr = vid.play();
+        if (pr && typeof pr.catch === "function") pr.catch(function () { /* poster / SVG remains visible */ });
+      } catch (e) { /* autoplay is best-effort */ }
+    }
 
     var CUSTOMERS = [
       {
@@ -943,6 +1025,7 @@
     }
 
     function gotoBrief(i) {
+      stopPortraitMedia();
       applyDay(i);
       renderBrief();
       hide("screen-game"); hide("screen-end"); show("screen-brief");
@@ -1013,7 +1096,13 @@
     function renderCustomer() {
       var c = CUSTOMERS[S.idx];
       S.selected = null;
-      el("portrait-slot").innerHTML = PORTRAITS[c.portrait];
+      stopPortraitMedia();
+      el("portrait-slot").innerHTML = '<div class="portrait-wrap">' + PORTRAITS[c.portrait] + "</div>";
+      var slug = videoSlugFor(c);
+      if (slug) {
+        var wrap = el("portrait-slot").querySelector(".portrait-wrap");
+        if (wrap) renderPortraitMedia(wrap, slug);
+      }
       el("cust-name").textContent = c.name;
       el("cust-sub").textContent = c.species + " · " + c.sub;
       el("cust-speech").innerHTML = c.speech + '<span class="wants">' + c.wants + "</span>";
@@ -1220,6 +1309,7 @@
 
     function endDay() {
       S.over = true;
+      stopPortraitMedia();
       hide("screen-game"); show("screen-end");
       var fired = S.citations >= 3;
       var avg = S.stars.length ? (S.stars.reduce(function (a, b) { return a + b; }, 0) / S.stars.length) : 0;
